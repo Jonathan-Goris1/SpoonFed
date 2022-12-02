@@ -2,7 +2,6 @@ package com.googleplaystore.spoonfed.data.repository
 
 import com.googleplaystore.spoonfed.data.mapper.toDomainModel
 import com.googleplaystore.spoonfed.data.remote.service.RecipeService
-import com.googleplaystore.spoonfed.domain.models.Recipe
 import com.googleplaystore.spoonfed.domain.models.Recipes
 import com.googleplaystore.spoonfed.domain.repository.RecipeRepository
 import com.googleplaystore.spoonfed.util.Resource
@@ -16,7 +15,7 @@ class RecipeRepositoryImpl@Inject constructor(
 
     override suspend fun getRandomRecipes(): Resource<Recipes> {
         return try {
-            val result = apiService.getRandomRecipes(number = 10, tags = "Dessert")
+            val result = apiService.getRandomRecipes(number = 10, tags = "dessert")
             Resource.Success(result.toDomainModel())
         } catch (e: IOException){
             e.printStackTrace()
