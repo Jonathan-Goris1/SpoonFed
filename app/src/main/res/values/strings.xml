@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">SpoonFed</string>
+    <string name="searchDescription">Search</string>
 </resources>
