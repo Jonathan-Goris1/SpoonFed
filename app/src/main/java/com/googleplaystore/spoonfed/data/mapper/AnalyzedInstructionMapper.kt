@@ -5,5 +5,5 @@ import com.googleplaystore.spoonfed.domain.models.AnalyzedInstruction
 
 fun AnalyzedInstructionResponse.toDomainModel(): AnalyzedInstruction = AnalyzedInstruction(
     name = name,
-    steps = steps.map { it.toDomainModel() }
+    steps = steps?.map { it.toDomainModel() }
 )

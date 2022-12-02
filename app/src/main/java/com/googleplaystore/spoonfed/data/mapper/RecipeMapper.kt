@@ -6,7 +6,7 @@ import com.googleplaystore.spoonfed.domain.models.Recipe
 fun RecipeResponse.toDomainModel(): Recipe = Recipe(
 
     aggregateLikes = aggregateLikes,
-    analyzedInstructions = analyzedInstructions.map { it.toDomainModel() },
+    analyzedInstructions = analyzedInstructions?.map { it.toDomainModel() },
     cheap = cheap,
     cookingMinutes = cookingMinutes,
     creditsText = creditsText,
@@ -14,7 +14,7 @@ fun RecipeResponse.toDomainModel(): Recipe = Recipe(
     dairyFree = dairyFree,
     diets = diets,
     dishTypes = dishTypes,
-    extendedIngredients = extendedIngredients.map { it.toDomainModel() },
+    extendedIngredients = extendedIngredients?.map { it.toDomainModel() },
     gaps = gaps,
     glutenFree = glutenFree,
     healthScore = healthScore,

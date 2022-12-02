@@ -8,5 +8,5 @@ fun EquipmentResponse.toDomainModel(): Equipment = Equipment(
     image = image,
     localizedName = localizedName,
      name = name,
-    temperature = temperature.toDomainModel()
+    temperature = temperature?.toDomainModel()
 )
