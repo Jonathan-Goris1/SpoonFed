@@ -1,9 +1,9 @@
 package com.googleplaystore.spoonfed.domain.models
 
 data class Step(
-    val equipment: List<Equipment>?,
-    val ingredients: List<Ingredient>?,
-    val length: Length?,
-    val number: Int?,
-    val step: String?
+    val equipment: List<Equipment>? = emptyList(),
+    val ingredients: List<Ingredient>? = emptyList(),
+    val length: Length? = Length(),
+    val number: Int? = 0,
+    val step: String? = ""
 )
