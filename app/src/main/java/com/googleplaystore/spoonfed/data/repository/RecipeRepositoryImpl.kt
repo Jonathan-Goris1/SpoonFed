@@ -15,7 +15,26 @@ class RecipeRepositoryImpl@Inject constructor(
 
     override suspend fun getRandomRecipes(): Resource<Recipes> {
         return try {
-            val result = apiService.getRandomRecipes(number = 10, tags = "dessert")
+            val result = apiService.getRandomRecipes(number = 100)
+            Resource.Success(result.toDomainModel())
+        } catch (e: IOException){
+            e.printStackTrace()
+            Resource.Error(
+                message = "Couldn't load company info"
+            )
+
+        } catch (e: HttpException){
+            e.printStackTrace()
+            Resource.Error(
+                message = e.message()
+            )
+
+        }
+    }
+
+    override suspend fun getQueryRecipes(query: String): Resource<Recipes> {
+        return try {
+            val result = apiService.getQueryRecipes(number = 10, query = query)
             Resource.Success(result.toDomainModel())
         } catch (e: IOException){
             e.printStackTrace()
