@@ -11,7 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO Think about creating use cases for different api calls before initializing this viewmodel
+
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
     private val repository: RecipeRepository
@@ -30,6 +30,39 @@ class HomeScreenViewModel @Inject constructor(
             when (
                 val result = repository.getRandomRecipes()
             ) {
+                is Resource.Success -> {
+                    result.data?.let { recipe ->
+                        state = state.copy(
+                            isLoading = false,
+                            recipes = recipe.recipes,
+                            error = null
+                        )
+                    }
+
+                }
+                is Resource.Error -> {
+                    state = state.copy(
+                        isLoading = false,
+                        error = result.message
+                    )
+                }
+
+                is Resource.Loading -> {
+                    state = state.copy(isLoading = result.isLoading)
+
+                }
+
+            }
+        }
+
+    }
+
+    fun getQueryRecipe(query: String) {
+        viewModelScope.launch {
+            when (
+                val result = repository.getQueryRecipes(query = query)
+            ) {
+                //TODO Figure out why UI is not updating with new list
                 is Resource.Success -> {
                     result.data?.let { recipe ->
                         state = state.copy(
