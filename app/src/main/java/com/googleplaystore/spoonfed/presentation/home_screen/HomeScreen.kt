@@ -1,11 +1,14 @@
 package com.googleplaystore.spoonfed.presentation.home_screen
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,7 +30,8 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 8.dp)
-            .fillMaxWidth()
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.Center
     ) {
 
         OutlinedTextField(
@@ -41,6 +45,7 @@ fun HomeScreen(
                     text = "Search for recipes"
                 )
             },
+            keyboardActions = KeyboardActions { viewModel.getQueryRecipe(query = viewModel.state.searchQuery) },
             leadingIcon = {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_baseline_search_24),
@@ -54,11 +59,16 @@ fun HomeScreen(
             shape = CircleShape,
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(bottom = 8.dp)
 
         )
 
 
-        LazyColumn {
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 128.dp),
+
+
+        ) {
             items(viewModel.state.recipes ?: emptyList()) { recipe ->
                 RecipeCard(recipe = recipe) {
 
