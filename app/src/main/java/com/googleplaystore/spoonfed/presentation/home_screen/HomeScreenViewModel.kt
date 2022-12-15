@@ -62,24 +62,24 @@ class HomeScreenViewModel @Inject constructor(
             when (
                 val result = repository.getQueryRecipes(query = query)
             ) {
-                //TODO Figure out why UI is not updating with new list
                 is Resource.Success -> {
                     result.data?.let { recipe ->
                         state = state.copy(
                             isLoading = false,
-                            recipes = recipe.recipes,
+                            recipes = recipe.results,
                             error = null
                         )
                     }
 
                 }
+                //TODO("Work on error cases")
                 is Resource.Error -> {
                     state = state.copy(
                         isLoading = false,
                         error = result.message
                     )
                 }
-
+                //TODO("Work on loading cases")
                 is Resource.Loading -> {
                     state = state.copy(isLoading = result.isLoading)
 
