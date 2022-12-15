@@ -1,5 +1,6 @@
 package com.googleplaystore.spoonfed.presentation.home_screen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +23,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.googleplaystore.spoonfed.R
 import com.googleplaystore.spoonfed.presentation.home_screen.components.RecipeCard
 
+private val TAG: String = "HOME_SCREEN"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -33,6 +36,7 @@ fun HomeScreen(
             .fillMaxWidth(),
         verticalArrangement = Arrangement.Center
     ) {
+        Log.d(TAG, "HomeScreen: ${viewModel.state.recipes}")
 
         OutlinedTextField(
             value = viewModel.state.searchQuery,
@@ -76,7 +80,6 @@ fun HomeScreen(
             }
         }
     }
-
 }
 
 @Preview
