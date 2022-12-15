@@ -34,7 +34,7 @@ class RecipeRepositoryImpl@Inject constructor(
 
     override suspend fun getQueryRecipes(query: String): Resource<Recipes> {
         return try {
-            val result = apiService.getQueryRecipes(number = 10, query = query)
+            val result = apiService.getQueryRecipes(number = 100, query = query)
             Resource.Success(result.toDomainModel())
         } catch (e: IOException){
             e.printStackTrace()
