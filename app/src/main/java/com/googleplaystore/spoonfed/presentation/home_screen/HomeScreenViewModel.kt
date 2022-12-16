@@ -35,7 +35,7 @@ class HomeScreenViewModel @Inject constructor(
                         state = state.copy(
                             isLoading = false,
                             recipes = recipe.recipes,
-                            error = null
+                            errorMessage = null
                         )
                     }
 
@@ -43,14 +43,12 @@ class HomeScreenViewModel @Inject constructor(
                 is Resource.Error -> {
                     state = state.copy(
                         isLoading = false,
-                        error = result.message
+                        errorMessage = result.message,
+                        hasError = true
+
                     )
                 }
 
-                is Resource.Loading -> {
-                    state = state.copy(isLoading = result.isLoading)
-
-                }
 
             }
         }
@@ -67,22 +65,18 @@ class HomeScreenViewModel @Inject constructor(
                         state = state.copy(
                             isLoading = false,
                             recipes = recipe.results,
-                            error = null
+                            errorMessage = null
                         )
                     }
 
                 }
-                //TODO("Work on error cases")
+
                 is Resource.Error -> {
                     state = state.copy(
                         isLoading = false,
-                        error = result.message
+                        errorMessage = result.message,
+                        hasError = true
                     )
-                }
-                //TODO("Work on loading cases")
-                is Resource.Loading -> {
-                    state = state.copy(isLoading = result.isLoading)
-
                 }
 
             }
