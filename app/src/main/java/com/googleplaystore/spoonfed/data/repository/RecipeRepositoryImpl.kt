@@ -16,11 +16,13 @@ class RecipeRepositoryImpl@Inject constructor(
     override suspend fun getRandomRecipes(): Resource<Recipes> {
         return try {
             val result = apiService.getRandomRecipes(number = 100)
+
             Resource.Success(result.toDomainModel())
+
         } catch (e: IOException){
             e.printStackTrace()
             Resource.Error(
-                message = "Couldn't load company info"
+                message = e.message.toString()
             )
 
         } catch (e: HttpException){
@@ -39,13 +41,13 @@ class RecipeRepositoryImpl@Inject constructor(
         } catch (e: IOException){
             e.printStackTrace()
             Resource.Error(
-                message = "Couldn't load company info"
+                message = e.message.toString()
             )
 
         } catch (e: HttpException){
             e.printStackTrace()
             Resource.Error(
-                message = "Couldn't load company info"
+                message = e.message()
             )
 
         }
