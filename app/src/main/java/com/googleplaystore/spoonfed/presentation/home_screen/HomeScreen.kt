@@ -1,10 +1,7 @@
 package com.googleplaystore.spoonfed.presentation.home_screen
 
 import android.util.Log
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -12,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -23,7 +21,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.googleplaystore.spoonfed.R
 import com.googleplaystore.spoonfed.presentation.home_screen.components.RecipeCard
 
-private val TAG: String = "HOME_SCREEN"
+private const val TAG: String = "HOME_SCREEN"
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,7 +35,7 @@ fun HomeScreen(
             .fillMaxWidth(),
         verticalArrangement = Arrangement.Center
     ) {
-        Log.d(TAG, "HomeScreen: ${viewModel.state.recipes}")
+        Log.d(TAG, "HomeScreen: ${viewModel.state.isLoading}")
 
         OutlinedTextField(
             value = viewModel.state.searchQuery,
@@ -66,24 +65,51 @@ fun HomeScreen(
                 .padding(bottom = 8.dp)
 
         )
-
-
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 128.dp),
-
-
-        ) {
+            ) {
             items(viewModel.state.recipes ?: emptyList()) { recipe ->
                 RecipeCard(recipe = recipe) {
 
                 }
             }
         }
+        if (viewModel.state.isLoading) {
+            Loading()
+        }
+        if (viewModel.state.hasError) {
+            ErrorState(errorMessage = viewModel.state.errorMessage.toString())
+        }
+
+    }
+}
+
+@Composable
+fun ErrorState(
+    errorMessage: String
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = errorMessage)
     }
 }
 
 @Preview
 @Composable
-fun HomeScreenPreview() {
-    HomeScreen()
+fun Loading() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(64.dp),
+            color = Color.White,
+            strokeWidth = 8.dp
+        )
+    }
+
 }
