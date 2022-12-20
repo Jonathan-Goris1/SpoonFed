@@ -54,7 +54,7 @@ class HomeScreenViewModel @Inject constructor(
         }
 
     }
-
+//TODO figure out state and why error and loading state not updating with changes in network state
     fun getQueryRecipe(query: String) {
         viewModelScope.launch {
             when (
