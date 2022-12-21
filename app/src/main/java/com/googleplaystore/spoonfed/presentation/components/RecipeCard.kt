@@ -1,4 +1,4 @@
-package com.googleplaystore.spoonfed.presentation.home_screen.components
+package com.googleplaystore.spoonfed.presentation.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
