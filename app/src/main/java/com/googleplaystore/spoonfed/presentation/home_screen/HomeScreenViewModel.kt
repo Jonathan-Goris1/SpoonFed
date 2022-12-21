@@ -21,7 +21,8 @@ class HomeScreenViewModel @Inject constructor(
     init {
         getRandomRecipe()
     }
-     fun updateSearchQuery(query: String){
+
+    fun updateSearchQuery(query: String) {
         state = state.copy(searchQuery = query)
     }
 
@@ -49,12 +50,12 @@ class HomeScreenViewModel @Inject constructor(
                     )
                 }
 
-
             }
         }
 
     }
-//TODO figure out state and why error and loading state not updating with changes in network state
+
+    //TODO figure out state and why error and loading state not updating with changes in network state
     fun getQueryRecipe(query: String) {
         viewModelScope.launch {
             when (
