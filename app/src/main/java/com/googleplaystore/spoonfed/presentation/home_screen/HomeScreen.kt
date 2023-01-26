@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,19 +29,22 @@ private const val TAG: String = "HOME_SCREEN"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    viewModel: HomeScreenViewModel = hiltViewModel()
+    homeViewModel: HomeScreenViewModel = hiltViewModel()
 ) {
+    val state = homeViewModel.uiState.collectAsState().value
+
+
     Column(
         modifier = Modifier
-            .padding(horizontal = 8.dp, vertical = 8.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        Log.d(TAG, "HomeScreen: ${viewModel.state.isLoading}")
+        Log.d(TAG, "HomeScreen: ${state.isLoading}")
 
         OutlinedTextField(
-            value = viewModel.state.searchQuery,
-            onValueChange = { viewModel.updateSearchQuery(it) },
+            value = state.searchQuery,
+            onValueChange = { homeViewModel.updateSearchQuery(it) },
             maxLines = 1,
             singleLine = true,
             textStyle = TextStyle(color = Color.White),
@@ -49,7 +53,7 @@ fun HomeScreen(
                     text = "Search for recipes"
                 )
             },
-            keyboardActions = KeyboardActions { viewModel.getQueryRecipe(query = viewModel.state.searchQuery) },
+            keyboardActions = KeyboardActions { homeViewModel.getQueryRecipe(query = state.searchQuery) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Filled.Search,
@@ -69,20 +73,22 @@ fun HomeScreen(
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 128.dp),
             ) {
-            items(viewModel.state.recipes ?: emptyList()) { recipe ->
+            items(state.recipes ?: emptyList()) { recipe ->
                 RecipeCard(recipe = recipe) {
 
                 }
             }
         }
-        if (viewModel.state.isLoading) {
+        if (state.isLoading) {
             Loading()
         }
-        if (viewModel.state.hasError) {
-            ErrorState(errorMessage = viewModel.state.errorMessage.toString())
+        if (state.hasError) {
+            ErrorState(errorMessage = state.errorMessage.toString())
         }
     }
 }
+
+
 
 @Composable
 fun ErrorState(
