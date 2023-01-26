@@ -1,13 +1,15 @@
 package com.googleplaystore.spoonfed.presentation.home_screen
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.googleplaystore.spoonfed.domain.repository.RecipeRepository
 import com.googleplaystore.spoonfed.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,14 +18,16 @@ import javax.inject.Inject
 class HomeScreenViewModel @Inject constructor(
     private val repository: RecipeRepository
 ) : ViewModel() {
-    var state by mutableStateOf(HomeScreenState())
+
+    private val _uiState = MutableStateFlow(HomeScreenState(isLoading = true))
+    val uiState: StateFlow<HomeScreenState> = _uiState.asStateFlow()
 
     init {
         getRandomRecipe()
     }
 
     fun updateSearchQuery(query: String) {
-        state = state.copy(searchQuery = query)
+        _uiState.update { it.copy(searchQuery = query) }
     }
 
     private fun getRandomRecipe() {
@@ -33,21 +37,23 @@ class HomeScreenViewModel @Inject constructor(
             ) {
                 is Resource.Success -> {
                     result.data?.let { recipe ->
-                        state = state.copy(
+                        _uiState.update {
+                            it.copy(
                             isLoading = false,
                             recipes = recipe.recipes,
                             errorMessage = null
-                        )
+                        ) }
                     }
 
                 }
                 is Resource.Error -> {
-                    state = state.copy(
-                        isLoading = false,
-                        errorMessage = result.message,
-                        hasError = true
-
-                    )
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = result.message,
+                            hasError = true
+                        )
+                    }
                 }
 
             }
@@ -63,21 +69,25 @@ class HomeScreenViewModel @Inject constructor(
             ) {
                 is Resource.Success -> {
                     result.data?.let { recipe ->
-                        state = state.copy(
-                            isLoading = false,
-                            recipes = recipe.results,
-                            errorMessage = null
-                        )
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                recipes = recipe.results,
+                                errorMessage = null
+                            )
+                        }
                     }
 
                 }
 
                 is Resource.Error -> {
-                    state = state.copy(
-                        isLoading = false,
-                        errorMessage = result.message,
-                        hasError = true
-                    )
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = result.message,
+                            hasError = true
+                        )
+                    }
                 }
 
             }
