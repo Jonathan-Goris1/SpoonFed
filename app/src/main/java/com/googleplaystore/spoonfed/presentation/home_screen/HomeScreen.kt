@@ -17,22 +17,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.googleplaystore.spoonfed.R
+import com.googleplaystore.spoonfed.domain.models.Recipe
 import com.googleplaystore.spoonfed.presentation.components.RecipeCard
 
 private const val TAG: String = "HOME_SCREEN"
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun HomeScreen(
     homeViewModel: HomeScreenViewModel = hiltViewModel()
 ) {
     val state = homeViewModel.uiState.collectAsState().value
-
 
     Column(
         modifier = Modifier
@@ -42,43 +41,10 @@ fun HomeScreen(
     ) {
         Log.d(TAG, "HomeScreen: ${state.isLoading}")
 
-        OutlinedTextField(
-            value = state.searchQuery,
-            onValueChange = { homeViewModel.updateSearchQuery(it) },
-            maxLines = 1,
-            singleLine = true,
-            textStyle = TextStyle(color = Color.White),
-            placeholder = {
-                Text(
-                    text = "Search for recipes"
-                )
-            },
-            keyboardActions = KeyboardActions { homeViewModel.getQueryRecipe(query = state.searchQuery) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Filled.Search,
-                    contentDescription = stringResource(id = R.string.searchDescription)
-                )
-            },
-            colors = TextFieldDefaults.textFieldColors(
-                placeholderColor = Color.LightGray,
-                containerColor = Color.Transparent
-            ),
-            shape = CircleShape,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp)
+        SearchBar(foodName = state.searchQuery, onFoodNameChange = {homeViewModel.updateSearchQuery(it)}, getQueryRecipe = {homeViewModel.getQueryRecipe(state.searchQuery)})
 
-        )
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 128.dp),
-            ) {
-            items(state.recipes ?: emptyList()) { recipe ->
-                RecipeCard(recipe = recipe) {
+        RecipeItem(recipe = state.recipes)
 
-                }
-            }
-        }
         if (state.isLoading) {
             Loading()
         }
@@ -88,7 +54,61 @@ fun HomeScreen(
     }
 }
 
+@Composable
+fun RecipeItem(
+    recipe: List<Recipe>?
+){
 
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 128.dp),
+    ) {
+        items(recipe ?: emptyList()) { recipe ->
+            RecipeCard(recipe = recipe) {
+
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchBar(
+    foodName: String,
+    onFoodNameChange: (String) -> Unit,
+    getQueryRecipe: (String) -> Unit
+
+){
+    OutlinedTextField(
+        value = foodName,
+        onValueChange =  onFoodNameChange,
+        maxLines = 1,
+        singleLine = true,
+        textStyle = TextStyle(color = Color.White),
+        placeholder = {
+            Text(
+                text = "Search for recipes"
+            )
+        },
+        //TODO When triggering KeyboardAction, the list doesn't scroll back to top position.
+        keyboardActions = KeyboardActions { getQueryRecipe(foodName) },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Filled.Search,
+                contentDescription = stringResource(id = R.string.searchDescription)
+            )
+        },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            placeholderColor = Color.LightGray,
+            containerColor = Color.Transparent
+        ),
+        shape = CircleShape,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp)
+
+    )
+}
 
 @Composable
 fun ErrorState(
@@ -103,7 +123,7 @@ fun ErrorState(
     }
 }
 
-@Preview
+
 @Composable
 fun Loading() {
     Column(
