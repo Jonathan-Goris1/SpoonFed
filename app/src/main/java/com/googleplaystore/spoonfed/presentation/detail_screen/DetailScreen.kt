@@ -75,7 +75,9 @@ fun DetailScreen(
 
         }
     ) {
-        Column() {
+        Column {
+            Text(text = recipe?.title ?: "" )
+
             Image(
                 modifier = modifier
                     .fillMaxWidth()
@@ -84,6 +86,14 @@ fun DetailScreen(
                 contentDescription = recipe?.title,
                 contentScale = ContentScale.FillBounds
             )
+
+            Row() {
+                    Text(text = "Ingredients for")
+                    Text(text = "${recipe?.servings.toString()} servings" ?: "")
+
+            }
+
+            //TODO Figure out what to do with ingredients and hwo to display them.
         }
 
     }
