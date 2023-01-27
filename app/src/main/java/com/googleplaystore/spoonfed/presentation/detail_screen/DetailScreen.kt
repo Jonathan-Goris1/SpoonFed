@@ -1,6 +1,5 @@
 package com.googleplaystore.spoonfed.presentation.detail_screen
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -10,21 +9,38 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.googleplaystore.spoonfed.domain.models.Recipe
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun DetailScreen(
+    recipeID: Int?,
+    onNavigateBackToHomeScreen: () -> Boolean,
+    detailViewModel: DetailScreenViewModel = hiltViewModel()
+) {
+    val state = detailViewModel.uiState.collectAsState().value
+    
+    DetailItem(recipe = state.recipe, onNavigateBackToHomeScreen = {onNavigateBackToHomeScreen()})
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DetailItem(
+    onNavigateBackToHomeScreen: () -> Boolean,
     modifier: Modifier = Modifier,
-    recipe: Recipe?
+    recipe: Recipe?,
 ) {
     Scaffold(
         topBar = {
@@ -35,13 +51,15 @@ fun DetailScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            recipe?.title ?: ""
-                            , color = Color.White
+                            text = recipe?.title ?: "",
+                            color = Color.White,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = {onNavigateBackToHomeScreen() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Go Back"
@@ -74,24 +92,37 @@ fun DetailScreen(
 
 
         }
-    ) {
-        Column {
-            Text(text = recipe?.title ?: "" )
+    ) { paddingValues ->
+        Column(modifier = Modifier.padding(paddingValues)) {
+            Text(text = recipe?.title ?: "")
 
             Image(
                 modifier = modifier
                     .fillMaxWidth()
-                    .height(100.dp),
+                    .height(250.dp),
                 painter = rememberAsyncImagePainter(recipe?.image),
                 contentDescription = recipe?.title,
                 contentScale = ContentScale.FillBounds
             )
 
-            Row() {
-                    Text(text = "Ingredients for")
-                    Text(text = "${recipe?.servings.toString()} servings" ?: "")
+            Row(
+                modifier = Modifier.padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                    Text(
+                        textAlign = TextAlign.Start,
+                        text = "Ingredients for")
+                Spacer(Modifier.weight(1f))
+                    Text(
+                        textAlign = TextAlign.End,
+                        text = " ${recipe?.servings.toString()} servings")
+
 
             }
+
+
+
 
             //TODO Figure out what to do with ingredients and hwo to display them.
         }
