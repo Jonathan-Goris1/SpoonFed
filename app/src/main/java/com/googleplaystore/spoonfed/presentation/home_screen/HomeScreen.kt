@@ -19,9 +19,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.googleplaystore.spoonfed.R
 import com.googleplaystore.spoonfed.domain.models.Recipe
 import com.googleplaystore.spoonfed.presentation.components.RecipeCard
+import com.googleplaystore.spoonfed.presentation.navigation.Screens
 
 private const val TAG: String = "HOME_SCREEN"
 
@@ -29,6 +31,7 @@ private const val TAG: String = "HOME_SCREEN"
 
 @Composable
 fun HomeScreen(
+    navController: NavController,
     homeViewModel: HomeScreenViewModel = hiltViewModel()
 ) {
     val state = homeViewModel.uiState.collectAsState().value
@@ -43,7 +46,7 @@ fun HomeScreen(
 
         SearchBar(foodName = state.searchQuery, onFoodNameChange = {homeViewModel.updateSearchQuery(it)}, getQueryRecipe = {homeViewModel.getQueryRecipe(state.searchQuery)})
 
-        RecipeItem(recipe = state.recipes)
+        RecipeItem(recipe = state.recipes, navController = navController)
 
         if (state.isLoading) {
             Loading()
@@ -56,6 +59,7 @@ fun HomeScreen(
 
 @Composable
 fun RecipeItem(
+    navController: NavController,
     recipe: List<Recipe>?
 ){
 
@@ -63,9 +67,7 @@ fun RecipeItem(
         columns = GridCells.Adaptive(minSize = 128.dp),
     ) {
         items(recipe ?: emptyList()) { recipe ->
-            RecipeCard(recipe = recipe) {
-
-            }
+            RecipeCard(recipe = recipe) {  navController.navigate(Screens.DetailScreen.route + "?recipeId=${recipe.id}") }
         }
     }
 }
