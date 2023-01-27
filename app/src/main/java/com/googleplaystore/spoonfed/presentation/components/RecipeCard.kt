@@ -1,6 +1,5 @@
 package com.googleplaystore.spoonfed.presentation.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
@@ -14,7 +13,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
 import com.googleplaystore.spoonfed.domain.models.Recipe
 
 @Composable
@@ -37,11 +36,11 @@ fun RecipeCard(
            .padding(horizontal = 0.dp, vertical = 8.dp)
             .clickable(onClick = onClick)) {
 
-        Image(
+        AsyncImage(
             modifier = modifier
                 .width(120.dp)
                 .height(100.dp),
-            painter = rememberAsyncImagePainter(recipe?.image),
+            model = recipe?.image,
             contentDescription = recipe?.title,
             contentScale = ContentScale.FillBounds
         )
