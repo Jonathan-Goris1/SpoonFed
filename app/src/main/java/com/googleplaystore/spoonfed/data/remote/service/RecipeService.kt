@@ -1,5 +1,6 @@
 package com.googleplaystore.spoonfed.data.remote.service
 
+import com.googleplaystore.spoonfed.data.remote.responses.RecipeResponse
 import com.googleplaystore.spoonfed.data.remote.responses.RecipesResponse
 import com.googleplaystore.spoonfed.util.Constants.Companion.API_KEY
 import retrofit2.http.GET
@@ -26,5 +27,5 @@ interface RecipeService {
     suspend fun getRecipeByID(
         @Path("id") id: Int,
         @Query("apiKey") apiKey: String = API_KEY,
-    ): RecipesResponse
+    ): RecipeResponse
 }
