@@ -2,7 +2,12 @@ package com.googleplaystore.spoonfed.presentation.detail_screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -15,11 +20,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
+import com.googleplaystore.spoonfed.domain.models.ExtendedIngredient
 import com.googleplaystore.spoonfed.domain.models.Recipe
 
 
@@ -30,8 +37,8 @@ fun DetailScreen(
     detailViewModel: DetailScreenViewModel = hiltViewModel()
 ) {
     val state = detailViewModel.uiState.collectAsState().value
-    
-    DetailItem(recipe = state.recipe, onNavigateBackToHomeScreen = {onNavigateBackToHomeScreen()})
+
+    DetailItem(recipe = state.recipe, onNavigateBackToHomeScreen = { onNavigateBackToHomeScreen() })
 
 }
 
@@ -59,7 +66,7 @@ fun DetailItem(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = {onNavigateBackToHomeScreen() }) {
+                    IconButton(onClick = { onNavigateBackToHomeScreen() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Go Back"
@@ -93,7 +100,15 @@ fun DetailItem(
 
         }
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .scrollable(
+                    state = rememberScrollState(),
+                    orientation = Orientation.Vertical,
+                    enabled = true
+                )
+        ) {
             Text(text = recipe?.title ?: "")
 
             Image(
@@ -110,22 +125,64 @@ fun DetailItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
-                    Text(
-                        textAlign = TextAlign.Start,
-                        text = "Ingredients for")
+                Text(
+                    textAlign = TextAlign.Start,
+                    text = "Ingredients for",
+                    fontWeight = FontWeight.Bold
+                )
                 Spacer(Modifier.weight(1f))
-                    Text(
-                        textAlign = TextAlign.End,
-                        text = " ${recipe?.servings.toString()} servings")
+                Text(
+                    textAlign = TextAlign.End,
+                    text = " ${recipe?.servings.toString()} servings"
+                )
 
 
             }
+            ingredientsContent(ingredientsList = recipe?.extendedIngredients ?: emptyList())
 
-
-
-
-            //TODO Figure out what to do with ingredients and hwo to display them.
         }
 
     }
+}
+
+//TODO figure out how to display entire list without having to scroll
+@Composable
+fun ingredientsContent(
+    ingredientsList: List<ExtendedIngredient>
+) {
+    LazyColumn(
+        userScrollEnabled = true
+    ) {
+        items(ingredientsList) { ingredient ->
+            IngredientSection(ingredients = ingredient)
+        }
+    }
+}
+
+@Composable
+fun IngredientSection(
+    ingredients: ExtendedIngredient
+) {
+    Row(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Text(
+            textAlign = TextAlign.Start,
+            text = ingredients.name ?: ""
+        )
+        Spacer(Modifier.weight(1f))
+        Text(
+            textAlign = TextAlign.End,
+            text = " ${ingredients.amount} ${ingredients.unit}"
+        )
+    }
+    Divider(
+        modifier = Modifier.fillMaxWidth(),
+        thickness = 1.dp,
+        color = Color.LightGray
+    )
 }
