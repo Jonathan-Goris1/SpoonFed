@@ -30,6 +30,7 @@ import com.googleplaystore.spoonfed.domain.models.ExtendedIngredient
 import com.googleplaystore.spoonfed.domain.models.Recipe
 
 
+
 @Composable
 fun DetailScreen(
     recipeID: Int?,
@@ -138,7 +139,7 @@ fun DetailItem(
 
 
             }
-            ingredientsContent(ingredientsList = recipe?.extendedIngredients ?: emptyList())
+            IngredientsContent(ingredientsList = recipe?.extendedIngredients ?: emptyList())
 
         }
 
@@ -147,7 +148,7 @@ fun DetailItem(
 
 //TODO figure out how to display entire list without having to scroll
 @Composable
-fun ingredientsContent(
+fun IngredientsContent(
     ingredientsList: List<ExtendedIngredient>
 ) {
     LazyColumn(
