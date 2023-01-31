@@ -2,7 +2,7 @@ package com.googleplaystore.spoonfed.domain.models
 
 data class ExtendedIngredient(
     val aisle: String?,
-    val amount: Double?,
+    val amount: String?,
     val consistency: String?,
     val id: Int?,
     val image: String?,
