@@ -1,6 +1,7 @@
 package com.googleplaystore.spoonfed.presentation.detail_screen
 
-import androidx.compose.foundation.Image
+import android.view.View
+import android.widget.TextView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
@@ -20,15 +21,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.text.HtmlCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.rememberAsyncImagePainter
+import com.googleplaystore.spoonfed.R
 import com.googleplaystore.spoonfed.domain.models.ExtendedIngredient
+import com.googleplaystore.spoonfed.domain.models.NutrientX
 import com.googleplaystore.spoonfed.domain.models.Recipe
-
+import com.googleplaystore.spoonfed.presentation.components.HeaderText
+import com.googleplaystore.spoonfed.presentation.components.ImageLoader
 
 
 @Composable
@@ -112,11 +116,11 @@ fun DetailItem(
         ) {
             Text(text = recipe?.title ?: "")
 
-            Image(
+            ImageLoader(
                 modifier = modifier
                     .fillMaxWidth()
                     .height(250.dp),
-                painter = rememberAsyncImagePainter(recipe?.image),
+                model = recipe?.image,
                 contentDescription = recipe?.title,
                 contentScale = ContentScale.FillBounds
             )
@@ -126,13 +130,13 @@ fun DetailItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
-                Text(
+                HeaderText(
                     textAlign = TextAlign.Start,
                     text = "Ingredients for",
-                    fontWeight = FontWeight.Bold
+
                 )
                 Spacer(Modifier.weight(1f))
-                Text(
+                HeaderText(
                     textAlign = TextAlign.End,
                     text = " ${recipe?.servings.toString()} servings"
                 )
@@ -140,6 +144,7 @@ fun DetailItem(
 
             }
             IngredientsContent(ingredientsList = recipe?.extendedIngredients ?: emptyList())
+            NutrientsContent(nutrientList = recipe?.nutrition?.nutrients ?: emptyList())
 
         }
 
@@ -152,6 +157,7 @@ fun IngredientsContent(
     ingredientsList: List<ExtendedIngredient>
 ) {
     LazyColumn(
+        modifier = Modifier.fillMaxHeight(),
         userScrollEnabled = true
     ) {
         items(ingredientsList) { ingredient ->
@@ -171,19 +177,72 @@ fun IngredientSection(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        Text(
+       Text(
             textAlign = TextAlign.Start,
             text = ingredients.name ?: ""
         )
         Spacer(Modifier.weight(1f))
+
+//        Text(
+//            textAlign = TextAlign.End,
+//            text = HtmlCompat.fromHtml("&#8539", HtmlCompat.FROM_HTML_MODE_COMPACT)
+//            // " ${DoubleConvertToFraction.convertToFraction(ingredients.amount ?: 0.0)} ${ingredients.unit}"
+//        )
+        AndroidView(factory = { context ->
+            TextView(context).apply {
+                text = "${HtmlCompat.fromHtml("${ingredients.amount}", HtmlCompat.FROM_HTML_MODE_LEGACY)} ${ingredients.unit}"
+                setTextColor( resources.getColor(R.color.white))
+                textSize = 16f
+                textAlignment = View.TEXT_ALIGNMENT_TEXT_END
+            }
+        })
+    }
+    Divider(
+        modifier = Modifier.fillMaxWidth(),
+        thickness = 1.dp,
+        color = Color.DarkGray
+    )
+}
+
+@Composable
+fun NutrientsContent(
+    nutrientList: List<NutrientX>
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxHeight(),
+        userScrollEnabled = true
+    ) {
+        items(nutrientList) { nutrient ->
+            NutrientsSection(nutrient = nutrient)
+        }
+    }
+}
+
+@Composable
+fun NutrientsSection(
+    nutrient: NutrientX
+) {
+    Row(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Text(
+            textAlign = TextAlign.Start,
+            text = nutrient.name ?: ""
+        )
+        Spacer(Modifier.weight(1f))
+
         Text(
             textAlign = TextAlign.End,
-            text = " ${ingredients.amount} ${ingredients.unit}"
+            text = " ${nutrient.amount} ${nutrient.unit}"
         )
     }
     Divider(
         modifier = Modifier.fillMaxWidth(),
         thickness = 1.dp,
-        color = Color.LightGray
+        color = Color.DarkGray
     )
 }
