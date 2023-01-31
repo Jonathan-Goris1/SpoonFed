@@ -1,5 +1,6 @@
 package com.googleplaystore.spoonfed.domain.models
 
+
 data class Recipe(
     val aggregateLikes: Int? = 0,
     val analyzedInstructions: List<AnalyzedInstruction>? = emptyList(),
@@ -15,6 +16,7 @@ data class Recipe(
     val glutenFree: Boolean? = false,
     val healthScore: Int? = 0,
     val id: Int? = 0,
+    val nutrition: Nutrition? = Nutrition(),
     val image: String? = "",
     val imageType: String? = "",
     val instructions: String? = "",
