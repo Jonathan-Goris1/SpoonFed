@@ -1,45 +1,29 @@
 package com.googleplaystore.spoonfed.util
 
-import kotlin.math.ceil
-import kotlin.math.floor
-import kotlin.math.pow
+import java.math.BigDecimal
 
 object DoubleConvertToFraction {
 
     fun convertToFraction(d: Double): String {
-        if(floor(d) == d){
-            return d.toInt().toString()
-        }
-// get the whole number part
-        val i = ceil(d).toLong()
-        // get the fractional part
-        var numerator = d - i
-        // Convert the fractional part to a String
-        var frac = numerator.toString()
-        // We only want what's to the right of the //decimal point
-        frac = frac.substring(frac.indexOf('.'))
-        // Put the String back into a double
-        numerator = frac.toDouble()
-        val power = frac.length
-        var denominator = 10.0.pow(power.toDouble())
-        // implement findGCD()
-        val gcd: Int = findGCD(numerator, denominator)
-        numerator /= gcd.toDouble()
-        denominator /= gcd.toDouble()
-        return i.toString() + "-" + numerator.toLong() + "/" + denominator.toLong()
-    }
 
-    private fun findGCD(numerator: Double, denominator: Double): Int{
-        var n1 = numerator
-        var n2 = denominator
-
-        while (n1 != n2) {
-            if (n1 > n2)
-                n1 -= n2
-            else
-                n2 -= n1
+        val bigDecimal = BigDecimal(d)
+        val intValue: Int = bigDecimal.toInt()
+        var intString: String = intValue.toString()
+        if(intValue == 0){
+            intString = ""
         }
 
-        return n1.toInt()
+
+        val fractionString: String = when (bigDecimal.subtract(BigDecimal(intValue)).toDouble()) {
+            in 0.01..0.15 -> "&#8539" // 1/8
+            in 0.15..0.25 -> "&#188" // 1/4
+            in 0.25..0.33 -> "&#8531" // 1/3
+            in 0.33..0.50 -> "&#189" // 1/2
+            in 0.50..0.66 -> "&#8532" // 2/3
+            in 0.66..0.75 -> "&#190" // 3/4
+            else -> ""
+        }
+        return "$intString$fractionString"
+
     }
 }
