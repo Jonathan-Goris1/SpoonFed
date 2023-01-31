@@ -40,5 +40,6 @@ fun RecipeResponse.toDomainModel(): Recipe = Recipe(
     vegetarian = vegetarian,
     veryHealthy = veryHealthy,
     veryPopular = veryPopular,
-    weightWatcherSmartPoints = weightWatcherSmartPoints
+    weightWatcherSmartPoints = weightWatcherSmartPoints,
+    nutrition = nutrition?.toDomainModel()
 )
