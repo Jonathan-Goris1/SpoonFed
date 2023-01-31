@@ -20,6 +20,7 @@ data class RecipeResponse(
     val instructions: String?,
     val license: String?,
     val lowFodmap: Boolean?,
+    val nutrition: NutritionResponse?,
     val occasions: List<String>?,
     val originalId: Any?,
     val preparationMinutes: Int?,
