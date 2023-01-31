@@ -13,7 +13,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.googleplaystore.spoonfed.domain.models.Recipe
 
 @Composable
@@ -36,7 +35,7 @@ fun RecipeCard(
            .padding(horizontal = 0.dp, vertical = 8.dp)
             .clickable(onClick = onClick)) {
 
-        AsyncImage(
+        ImageLoader(
             modifier = modifier
                 .width(120.dp)
                 .height(100.dp),
