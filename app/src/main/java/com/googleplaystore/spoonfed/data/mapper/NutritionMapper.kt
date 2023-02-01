@@ -12,6 +12,5 @@ fun NutritionResponse.toDomainModel(): Nutrition = Nutrition(
 fun NutrientXResponse.toDomainModel(): NutrientX = NutrientX(
     amount = amount,
     name = name,
-    percentOfDailyNeeds = percentOfDailyNeeds,
     unit = unit
 )
