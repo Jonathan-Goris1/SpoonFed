@@ -3,12 +3,10 @@ package com.googleplaystore.spoonfed.presentation.detail_screen
 import android.view.View
 import android.widget.TextView
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -28,16 +26,13 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.googleplaystore.spoonfed.R
-import com.googleplaystore.spoonfed.domain.models.ExtendedIngredient
-import com.googleplaystore.spoonfed.domain.models.NutrientX
-import com.googleplaystore.spoonfed.domain.models.Recipe
-import com.googleplaystore.spoonfed.presentation.components.HeaderText
+import com.googleplaystore.spoonfed.domain.models.*
+import com.googleplaystore.spoonfed.presentation.components.HeaderRow
 import com.googleplaystore.spoonfed.presentation.components.ImageLoader
 
 
 @Composable
 fun DetailScreen(
-    recipeID: Int?,
     onNavigateBackToHomeScreen: () -> Boolean,
     detailViewModel: DetailScreenViewModel = hiltViewModel()
 ) {
@@ -51,7 +46,6 @@ fun DetailScreen(
 @Composable
 fun DetailItem(
     onNavigateBackToHomeScreen: () -> Boolean,
-    modifier: Modifier = Modifier,
     recipe: Recipe?,
 ) {
     Scaffold(
@@ -105,64 +99,54 @@ fun DetailItem(
 
         }
     ) { paddingValues ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .padding(paddingValues)
-                .scrollable(
-                    state = rememberScrollState(),
-                    orientation = Orientation.Vertical,
-                    enabled = true
-                )
+                .fillMaxSize()
         ) {
-            Text(text = recipe?.title ?: "")
-
-            ImageLoader(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .height(250.dp),
-                model = recipe?.image,
-                contentDescription = recipe?.title,
-                contentScale = ContentScale.FillBounds
-            )
-
-            Row(
-                modifier = Modifier.padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                HeaderText(
-                    textAlign = TextAlign.Start,
-                    text = "Ingredients for",
-
+            item { ImageProfile(title = recipe?.title ?: "", image = recipe?.image ?: "") }
+            item {
+                HeaderRow(
+                    text1 = "Ingredients for",
+                    text2 = "${recipe?.servings ?: 0} servings"
                 )
-                Spacer(Modifier.weight(1f))
-                HeaderText(
-                    textAlign = TextAlign.End,
-                    text = " ${recipe?.servings.toString()} servings"
-                )
-
-
             }
-            IngredientsContent(ingredientsList = recipe?.extendedIngredients ?: emptyList())
-            NutrientsContent(nutrientList = recipe?.nutrition?.nutrients ?: emptyList())
+            ingredientContent(ingredientsList = recipe?.extendedIngredients ?: emptyList())
+
+            item { HeaderRow(text1 = "Nutrition Info") }
+            nutrientsContent(nutrientList = recipe?.nutrition?.nutrients ?: emptyList())
+
+            item { HeaderRow(text1 = "Preparation") }
+            preparationContent(instructions = recipe?.analyzedInstructions ?: emptyList())
 
         }
 
     }
 }
 
-//TODO figure out how to display entire list without having to scroll
 @Composable
-fun IngredientsContent(
+fun ImageProfile(
+    title: String,
+    image: String
+) {
+    Text(text = title)
+
+    ImageLoader(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(250.dp),
+        model = image,
+        contentDescription = title,
+        contentScale = ContentScale.FillBounds
+    )
+}
+
+
+fun LazyListScope.ingredientContent(
     ingredientsList: List<ExtendedIngredient>
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxHeight(),
-        userScrollEnabled = true
-    ) {
-        items(ingredientsList) { ingredient ->
-            IngredientSection(ingredients = ingredient)
-        }
+    items(ingredientsList) { ingredient ->
+        IngredientSection(ingredients = ingredient)
     }
 }
 
@@ -177,21 +161,22 @@ fun IngredientSection(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-       Text(
+        Text(
             textAlign = TextAlign.Start,
             text = ingredients.name ?: ""
         )
         Spacer(Modifier.weight(1f))
 
-//        Text(
-//            textAlign = TextAlign.End,
-//            text = HtmlCompat.fromHtml("&#8539", HtmlCompat.FROM_HTML_MODE_COMPACT)
-//            // " ${DoubleConvertToFraction.convertToFraction(ingredients.amount ?: 0.0)} ${ingredients.unit}"
-//        )
+
         AndroidView(factory = { context ->
             TextView(context).apply {
-                text = "${HtmlCompat.fromHtml("${ingredients.amount}", HtmlCompat.FROM_HTML_MODE_LEGACY)} ${ingredients.unit}"
-                setTextColor( resources.getColor(R.color.white))
+                text = "${
+                    HtmlCompat.fromHtml(
+                        "${ingredients.amount}",
+                        HtmlCompat.FROM_HTML_MODE_LEGACY
+                    )
+                } ${ingredients.unit}"
+                setTextColor(resources.getColor(R.color.white))
                 textSize = 16f
                 textAlignment = View.TEXT_ALIGNMENT_TEXT_END
             }
@@ -204,17 +189,12 @@ fun IngredientSection(
     )
 }
 
-@Composable
-fun NutrientsContent(
+
+fun LazyListScope.nutrientsContent(
     nutrientList: List<NutrientX>
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxHeight(),
-        userScrollEnabled = true
-    ) {
-        items(nutrientList) { nutrient ->
-            NutrientsSection(nutrient = nutrient)
-        }
+    items(nutrientList) { nutrient ->
+        NutrientsSection(nutrient = nutrient)
     }
 }
 
@@ -245,4 +225,48 @@ fun NutrientsSection(
         thickness = 1.dp,
         color = Color.DarkGray
     )
+}
+
+fun LazyListScope.preparationContent(
+    instructions: List<AnalyzedInstruction>
+) {
+    items(instructions) { instruction ->
+        for (element in instruction.steps!!) {
+            PreparationSection(step = element)
+        }
+
+
+    }
+
+}
+
+@Composable
+fun PreparationSection(
+    step: Step
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(8.dp),
+        ) {
+            Text(
+                modifier = Modifier.padding(start = 8.dp),
+                text = "${step.number}"
+            )
+            Spacer(modifier = Modifier.padding(horizontal = 8.dp))
+
+            Text(
+                text = step.step ?: "",
+
+                )
+        }
+
+    }
+
+
 }
