@@ -24,9 +24,8 @@ fun NavGraphBuilder.homeNavGraph(
                 }
             )
 
-        ) { backStackEntry ->
+        ) {
             DetailScreen(
-                recipeID = backStackEntry.arguments?.getInt("recipeId"),
                 onNavigateBackToHomeScreen = { navController.popBackStack() })
 
         }
