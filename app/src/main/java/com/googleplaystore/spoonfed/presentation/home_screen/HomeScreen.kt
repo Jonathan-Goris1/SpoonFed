@@ -28,7 +28,6 @@ import com.googleplaystore.spoonfed.presentation.navigation.Screens
 private const val TAG: String = "HOME_SCREEN"
 
 
-
 @Composable
 fun HomeScreen(
     navController: NavController,
@@ -44,7 +43,10 @@ fun HomeScreen(
     ) {
         Log.d(TAG, "HomeScreen: ${state.isLoading}")
 
-        SearchBar(foodName = state.searchQuery, onFoodNameChange = {homeViewModel.updateSearchQuery(it)}, getQueryRecipe = {homeViewModel.getQueryRecipe(state.searchQuery)})
+        SearchBar(
+            foodName = state.searchQuery,
+            onFoodNameChange = { homeViewModel.updateSearchQuery(it) },
+            getQueryRecipe = { homeViewModel.getQueryRecipe(state.searchQuery) })
 
         RecipeItem(recipe = state.recipes, navController = navController)
 
@@ -61,13 +63,13 @@ fun HomeScreen(
 fun RecipeItem(
     navController: NavController,
     recipe: List<Recipe>?
-){
+) {
 
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 128.dp),
     ) {
         items(recipe ?: emptyList()) { recipe ->
-            RecipeCard(recipe = recipe) {  navController.navigate(Screens.DetailScreen.route + "?recipeId=${recipe.id}") }
+            RecipeCard(recipe = recipe) { navController.navigate(Screens.DetailScreen.route + "?recipeId=${recipe.id}") }
         }
     }
 }
@@ -80,10 +82,10 @@ fun SearchBar(
     onFoodNameChange: (String) -> Unit,
     getQueryRecipe: (String) -> Unit
 
-){
+) {
     OutlinedTextField(
         value = foodName,
-        onValueChange =  onFoodNameChange,
+        onValueChange = onFoodNameChange,
         maxLines = 1,
         singleLine = true,
         textStyle = TextStyle(color = Color.White),
