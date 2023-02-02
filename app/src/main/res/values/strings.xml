@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">SpoonFed</string>
     <string name="searchDescription">Search</string>
+    <string name="IngredientsHeaderText">Ingredients for</string>
+    <string name="NutritionHeaderText">Nutrition</string>
+    <string name="PreparationHeaderText">Preparation</string>
 </resources>
