@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -38,7 +39,7 @@ fun DetailScreen(
 ) {
     val state = detailViewModel.uiState.collectAsState().value
 
-    DetailItem(recipe = state.recipe, onNavigateBackToHomeScreen = { onNavigateBackToHomeScreen() })
+    DetailItem(recipe = state.recipe, onNavigateBackToHomeScreen = { onNavigateBackToHomeScreen() }, isExpanded = state.isExpanded, isExpandedText = state.expandedText, expandEvent = { detailViewModel.isExpandedView(notExpanded = !state.isExpanded) })
 
 }
 
@@ -47,6 +48,9 @@ fun DetailScreen(
 fun DetailItem(
     onNavigateBackToHomeScreen: () -> Boolean,
     recipe: Recipe?,
+    isExpanded: Boolean,
+    isExpandedText: String,
+    expandEvent: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -107,16 +111,19 @@ fun DetailItem(
             item { ImageProfile(title = recipe?.title ?: "", image = recipe?.image ?: "") }
             item {
                 HeaderRow(
-                    text1 = "Ingredients for",
-                    text2 = "${recipe?.servings ?: 0} servings"
+                    text1 = stringResource(id = R.string.IngredientsHeaderText),
+                    text2 = "${recipe?.servings ?: 0} servings",
                 )
             }
             ingredientContent(ingredientsList = recipe?.extendedIngredients ?: emptyList())
 
-            item { HeaderRow(text1 = "Nutrition Info") }
-            nutrientsContent(nutrientList = recipe?.nutrition?.nutrients ?: emptyList())
+            item { HeaderRow(text1 = stringResource(id = R.string.NutritionHeaderText), text2 = isExpandedText, onClick = {expandEvent()}) }
+            if(isExpanded){
+                nutrientsContent(nutrientList = recipe?.nutrition?.nutrients ?: emptyList())
+            }
 
-            item { HeaderRow(text1 = "Preparation") }
+
+            item { HeaderRow(text1 = stringResource(id = R.string.PreparationHeaderText)) }
             preparationContent(instructions = recipe?.analyzedInstructions ?: emptyList())
 
         }
