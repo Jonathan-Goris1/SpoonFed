@@ -7,5 +7,7 @@ data class DetailScreenState(
     val hasError: Boolean= false,
     val errorMessage: String? = null,
     val recipe: Recipe = Recipe(),
+    val isExpanded: Boolean = false,
+    val expandedText: String = ""
 
 )
