@@ -29,6 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.googleplaystore.spoonfed.R
 import com.googleplaystore.spoonfed.domain.models.*
 import com.googleplaystore.spoonfed.presentation.components.HeaderRow
+import com.googleplaystore.spoonfed.presentation.components.HeaderText
 import com.googleplaystore.spoonfed.presentation.components.ImageLoader
 
 
@@ -122,7 +123,6 @@ fun DetailItem(
                 nutrientsContent(nutrientList = recipe?.nutrition?.nutrients ?: emptyList())
             }
 
-
             item { HeaderRow(text1 = stringResource(id = R.string.PreparationHeaderText)) }
             preparationContent(instructions = recipe?.analyzedInstructions ?: emptyList())
 
@@ -136,7 +136,7 @@ fun ImageProfile(
     title: String,
     image: String
 ) {
-    Text(text = title)
+    HeaderText(text = title, textAlign = TextAlign.Center, modifier = Modifier.padding(start = 8.dp) )
 
     ImageLoader(
         modifier = Modifier
