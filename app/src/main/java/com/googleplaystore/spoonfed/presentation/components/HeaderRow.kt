@@ -31,7 +31,6 @@ fun HeaderRow(
         HeaderText(
             textAlign = TextAlign.Start,
             text = text1,
-
             )
         Spacer(Modifier.weight(1f))
 
