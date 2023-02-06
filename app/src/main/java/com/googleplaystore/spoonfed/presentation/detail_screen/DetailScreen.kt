@@ -2,18 +2,18 @@ package com.googleplaystore.spoonfed.presentation.detail_screen
 
 import android.view.View
 import android.widget.TextView
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,6 +31,9 @@ import com.googleplaystore.spoonfed.domain.models.*
 import com.googleplaystore.spoonfed.presentation.components.HeaderRow
 import com.googleplaystore.spoonfed.presentation.components.HeaderText
 import com.googleplaystore.spoonfed.presentation.components.ImageLoader
+import com.googleplaystore.spoonfed.presentation.components.ScrollToTopButton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -39,8 +42,23 @@ fun DetailScreen(
     detailViewModel: DetailScreenViewModel = hiltViewModel()
 ) {
     val state = detailViewModel.uiState.collectAsState().value
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+    val showButton by remember {
+        derivedStateOf {
+            listState.firstVisibleItemIndex > 0
+        }
+    }
 
-    DetailItem(recipe = state.recipe, onNavigateBackToHomeScreen = { onNavigateBackToHomeScreen() }, isExpanded = state.isExpanded, isExpandedText = state.expandedText, expandEvent = { detailViewModel.isExpandedView(notExpanded = !state.isExpanded) })
+    DetailItem(recipe = state.recipe,
+        onNavigateBackToHomeScreen = { onNavigateBackToHomeScreen() },
+        isExpanded = state.isExpanded,
+        isExpandedText = state.expandedText,
+        expandEvent = { detailViewModel.isExpandedView(notExpanded = !state.isExpanded) },
+        coroutineScope = coroutineScope,
+        showButton = showButton,
+        listState = listState
+    )
 
 }
 
@@ -51,9 +69,23 @@ fun DetailItem(
     recipe: Recipe?,
     isExpanded: Boolean,
     isExpandedText: String,
-    expandEvent: () -> Unit
+    expandEvent: () -> Unit,
+    showButton: Boolean,
+    listState: LazyListState,
+    coroutineScope: CoroutineScope
 ) {
     Scaffold(
+        floatingActionButton = {
+            AnimatedVisibility(visible = showButton, enter = fadeIn(), exit = fadeOut()) {
+                ScrollToTopButton(goToTop = {
+                    coroutineScope.launch {
+                        listState.animateScrollToItem(0)
+                    }
+                })
+
+            }
+        },
+
         topBar = {
             TopAppBar(
                 title = {
@@ -100,11 +132,12 @@ fun DetailItem(
 
                 }
             )
-
-
         }
+
+
     ) { paddingValues ->
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
