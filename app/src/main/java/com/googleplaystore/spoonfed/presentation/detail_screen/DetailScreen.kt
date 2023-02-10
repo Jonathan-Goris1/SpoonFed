@@ -212,15 +212,20 @@ fun IngredientSection(
             TextView(context).apply {
                 text = "${
                     HtmlCompat.fromHtml(
-                        "${ingredients.amount}",
+                        "${ingredients.amount} ",
                         HtmlCompat.FROM_HTML_MODE_LEGACY
                     )
-                } ${ingredients.unit}"
+                }"
                 setTextColor(resources.getColor(R.color.white))
                 textSize = 16f
                 textAlignment = View.TEXT_ALIGNMENT_TEXT_END
             }
         })
+
+        Text(
+            textAlign = TextAlign.Start,
+            text = ingredients.unit ?: ""
+        )
     }
     Divider(
         modifier = Modifier.fillMaxWidth(),
