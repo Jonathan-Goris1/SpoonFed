@@ -138,7 +138,7 @@ fun SearchBar(
         shape = CircleShape,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 8.dp)
+            .padding(8.dp)
 
     )
 }
