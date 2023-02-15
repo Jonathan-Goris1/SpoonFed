@@ -21,16 +21,6 @@ fun RecipeCard(
     recipe: Recipe?,
     onClick: () -> Unit
 ) {
-//
-//    Card(
-//        modifier = modifier
-//            .padding(horizontal = 0.dp, vertical = 8.dp)
-//            .clickable(onClick = onClick)
-//            .clip(shape = RectangleShape),
-//        colors = CardDefaults.cardColors(
-//            containerColor = Color.Transparent
-//        )
-//    ) {
     Column(modifier = modifier
            .padding(horizontal = 0.dp, vertical = 8.dp)
             .clickable(onClick = onClick)) {
@@ -55,6 +45,6 @@ fun RecipeCard(
                 .width(120.dp)
         )
     }
-    //}
+
 
 }
