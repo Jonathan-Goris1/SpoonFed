@@ -120,7 +120,7 @@ fun SearchBar(
         textStyle = TextStyle(color = Color.White),
         placeholder = {
             Text(
-                text = "Search for recipes"
+                text = stringResource(id = R.string.SearchForRecipesText)
             )
         },
         //TODO When triggering KeyboardAction, the list doesn't scroll back to top position.

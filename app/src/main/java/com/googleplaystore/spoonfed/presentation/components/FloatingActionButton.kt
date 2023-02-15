@@ -7,6 +7,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.googleplaystore.spoonfed.R
 
 @Composable
 fun ScrollToTopButton(goToTop: () -> Unit){
@@ -16,7 +18,7 @@ fun ScrollToTopButton(goToTop: () -> Unit){
         contentColor = Color.Red,
         onClick = { goToTop() }
     ) {
-        Icon(imageVector = Icons.Filled.KeyboardArrowUp , contentDescription = "Back to top")
+        Icon(imageVector = Icons.Filled.KeyboardArrowUp , contentDescription = stringResource(id = R.string.FAB_ContentDescription))
     }
 }
 

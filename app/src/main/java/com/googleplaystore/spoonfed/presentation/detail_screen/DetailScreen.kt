@@ -105,7 +105,7 @@ fun DetailItem(
                     IconButton(onClick = { onNavigateBackToHomeScreen() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Go Back"
+                            contentDescription = stringResource(id = R.string.GoBack)
                         )
                     }
                 },
@@ -125,7 +125,7 @@ fun DetailItem(
                         Icon(
                             modifier = Modifier.size(20.dp, 20.dp),
                             imageVector = Icons.Filled.Share,
-                            contentDescription = "Share Recipe"
+                            contentDescription = stringResource(id = R.string.ShareRecipeContentDescription)
                         )
                     }
 
@@ -146,7 +146,7 @@ fun DetailItem(
             item {
                 HeaderRow(
                     text1 = stringResource(id = R.string.IngredientsHeaderText),
-                    text2 = "${recipe?.servings ?: 0} servings",
+                    text2 = "${recipe?.servings ?: 0} ${stringResource(id = R.string.ServingsHeaderText)}",
                 )
             }
             ingredientContent(ingredientsList = recipe?.extendedIngredients ?: emptyList())

@@ -2,6 +2,12 @@
     <string name="app_name">SpoonFed</string>
     <string name="searchDescription">Search</string>
     <string name="IngredientsHeaderText">Ingredients for</string>
+    <string name="ServingsHeaderText">servings</string>
     <string name="NutritionHeaderText">Nutrition</string>
     <string name="PreparationHeaderText">Preparation</string>
+    <string name="ShareRecipeContentDescription">Share Recipes</string>
+    <string name="SearchForRecipesText">Search for recipes</string>
+    <string name="FAB_ContentDescription">Back to top</string>
+    <string name="GoBack">Go Back</string>
+
 </resources>
