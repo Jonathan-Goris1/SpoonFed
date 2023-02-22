@@ -10,9 +10,9 @@ import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
-class RecipeRepositoryImpl@Inject constructor(
+class RecipeRepositoryImpl @Inject constructor(
     private val apiService: RecipeService,
-    ): RecipeRepository {
+) : RecipeRepository {
 
     override suspend fun getRandomRecipes(): Resource<Recipes> {
         return try {
@@ -20,13 +20,13 @@ class RecipeRepositoryImpl@Inject constructor(
 
             Resource.Success(result.toDomainModel())
 
-        } catch (e: IOException){
+        } catch (e: IOException) {
             e.printStackTrace()
             Resource.Error(
                 message = e.message.toString()
             )
 
-        } catch (e: HttpException){
+        } catch (e: HttpException) {
             e.printStackTrace()
             Resource.Error(
                 message = e.message()
@@ -39,13 +39,13 @@ class RecipeRepositoryImpl@Inject constructor(
         return try {
             val result = apiService.getQueryRecipes(number = 100, query = query)
             Resource.Success(result.toDomainModel())
-        } catch (e: IOException){
+        } catch (e: IOException) {
             e.printStackTrace()
             Resource.Error(
                 message = e.message.toString()
             )
 
-        } catch (e: HttpException){
+        } catch (e: HttpException) {
             e.printStackTrace()
             Resource.Error(
                 message = e.message()
@@ -58,13 +58,13 @@ class RecipeRepositoryImpl@Inject constructor(
         return try {
             val result = apiService.getRecipeByID(id = recipeID)
             Resource.Success(result.toDomainModel())
-        } catch (e: IOException){
+        } catch (e: IOException) {
             e.printStackTrace()
             Resource.Error(
                 message = e.message.toString()
             )
 
-        } catch (e: HttpException){
+        } catch (e: HttpException) {
             e.printStackTrace()
             Resource.Error(
                 message = e.message()

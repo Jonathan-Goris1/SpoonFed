@@ -21,9 +21,11 @@ fun RecipeCard(
     recipe: Recipe?,
     onClick: () -> Unit
 ) {
-    Column(modifier = modifier
-           .padding(horizontal = 0.dp, vertical = 8.dp)
-            .clickable(onClick = onClick)) {
+    Column(
+        modifier = modifier
+            .padding(horizontal = 0.dp, vertical = 8.dp)
+            .clickable(onClick = onClick)
+    ) {
 
         ImageLoader(
             modifier = modifier

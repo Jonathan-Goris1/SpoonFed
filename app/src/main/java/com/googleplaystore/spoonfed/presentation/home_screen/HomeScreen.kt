@@ -1,6 +1,5 @@
 package com.googleplaystore.spoonfed.presentation.home_screen
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -17,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -49,11 +49,11 @@ fun HomeScreen(
     Scaffold(
         floatingActionButton = {
             AnimatedVisibility(visible = showButton, enter = fadeIn(), exit = fadeOut()) {
-                ScrollToTopButton(goToTop = {
+                ScrollToTopButton {
                     coroutineScope.launch {
                         listState.animateScrollToItem(0)
                     }
-                })
+                }
 
             }
         }
@@ -62,28 +62,29 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(paddingValues),
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Log.d(TAG, "HomeScreen: ${state.isLoading}")
+
 
             SearchBar(
                 foodName = state.searchQuery,
                 onFoodNameChange = { homeViewModel.updateSearchQuery(it) },
-                getQueryRecipe = { homeViewModel.getQueryRecipe(state.searchQuery) })
+                getQueryRecipe = { homeViewModel.getQueryRecipe(state.searchQuery) },
+                scrollToTop = { coroutineScope.launch { listState.scrollToItem(0) } })
 
-            RecipeItem(recipe = state.recipes, navController = navController, listState = listState)
+            RecipeItem(
+                recipe = state.recipes,
+                navController = navController,
+                listState = listState
+            )
 
-            if (state.isLoading) {
-                Loading()
-            }
-            if (state.hasError) {
-                ErrorState(errorMessage = state.errorMessage.toString())
-            }
         }
     }
 
 
 }
+
 
 @Composable
 fun RecipeItem(
@@ -100,6 +101,7 @@ fun RecipeItem(
         items(recipe ?: emptyList()) { recipe ->
             RecipeCard(recipe = recipe) { navController.navigate(Screens.DetailScreen.route + "?recipeId=${recipe.id}") }
         }
+
     }
 }
 
@@ -109,7 +111,8 @@ fun RecipeItem(
 fun SearchBar(
     foodName: String,
     onFoodNameChange: (String) -> Unit,
-    getQueryRecipe: (String) -> Unit
+    getQueryRecipe: (String) -> Unit,
+    scrollToTop: () -> Unit
 
 ) {
     OutlinedTextField(
@@ -124,7 +127,7 @@ fun SearchBar(
             )
         },
         //TODO When triggering KeyboardAction, the list doesn't scroll back to top position.
-        keyboardActions = KeyboardActions { getQueryRecipe(foodName) },
+        keyboardActions = KeyboardActions { getQueryRecipe(foodName); scrollToTop() },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Filled.Search,
@@ -145,10 +148,10 @@ fun SearchBar(
 
 @Composable
 fun ErrorState(
-    errorMessage: String
+    errorMessage: String = "No Internet"
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -158,7 +161,7 @@ fun ErrorState(
 
 
 @Composable
-fun Loading() {
+fun HomeLoadingWheel() {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -171,4 +174,16 @@ fun Loading() {
         )
     }
 
+}
+
+@Preview
+@Composable
+fun ErrorStatePreview() {
+    ErrorState(errorMessage = "No Internet available")
+}
+
+@Preview
+@Composable
+fun LoadingPreview() {
+    HomeLoadingWheel()
 }

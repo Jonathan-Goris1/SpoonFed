@@ -19,8 +19,10 @@ class HomeScreenViewModel @Inject constructor(
     private val repository: RecipeRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HomeScreenState(isLoading = true))
+
+    private val _uiState = MutableStateFlow(HomeScreenState())
     val uiState: StateFlow<HomeScreenState> = _uiState.asStateFlow()
+
 
     init {
         getRandomRecipe()
@@ -28,6 +30,7 @@ class HomeScreenViewModel @Inject constructor(
 
     fun updateSearchQuery(query: String) {
         _uiState.update { it.copy(searchQuery = query) }
+
     }
 
     private fun getRandomRecipe() {
@@ -39,10 +42,11 @@ class HomeScreenViewModel @Inject constructor(
                     result.data?.let { recipe ->
                         _uiState.update {
                             it.copy(
-                            isLoading = false,
-                            recipes = recipe.recipes,
-                            errorMessage = null
-                        ) }
+                                isLoading = false,
+                                recipes = recipe.recipes,
+                                errorMessage = null
+                            )
+                        }
                     }
 
                 }
@@ -57,7 +61,9 @@ class HomeScreenViewModel @Inject constructor(
                 }
 
             }
+
         }
+
 
     }
 
@@ -91,7 +97,11 @@ class HomeScreenViewModel @Inject constructor(
                 }
 
             }
-        }
 
+
+        }
     }
 }
+
+
+

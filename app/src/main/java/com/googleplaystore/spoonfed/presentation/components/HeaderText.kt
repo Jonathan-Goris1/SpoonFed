@@ -19,7 +19,7 @@ fun HeaderText(
     textAlign: TextAlign?,
 
 
-    ){
+    ) {
     Text(
         modifier = modifier,
         text = text,

@@ -26,11 +26,12 @@ class DetailScreenViewModel @Inject constructor(
     init {
         getRecipeByID()
     }
-    fun isExpandedView(notExpanded: Boolean){
+
+    fun isExpandedView(notExpanded: Boolean) {
         _uiState.update { it.copy(isExpanded = notExpanded) }
-        if(notExpanded){
+        if (notExpanded) {
             _uiState.update { it.copy(expandedText = "Hide Info -") }
-        }else{
+        } else {
             _uiState.update { it.copy(expandedText = "View Info +") }
         }
     }

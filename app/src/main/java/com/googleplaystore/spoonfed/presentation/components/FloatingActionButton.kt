@@ -11,14 +11,17 @@ import androidx.compose.ui.res.stringResource
 import com.googleplaystore.spoonfed.R
 
 @Composable
-fun ScrollToTopButton(goToTop: () -> Unit){
+fun ScrollToTopButton(goToTop: () -> Unit) {
     FloatingActionButton(
         shape = CircleShape,
         containerColor = Color.Black,
         contentColor = Color.Red,
         onClick = { goToTop() }
     ) {
-        Icon(imageVector = Icons.Filled.KeyboardArrowUp , contentDescription = stringResource(id = R.string.FAB_ContentDescription))
+        Icon(
+            imageVector = Icons.Filled.KeyboardArrowUp,
+            contentDescription = stringResource(id = R.string.FAB_ContentDescription)
+        )
     }
 }
 
