@@ -1,15 +1,17 @@
 package com.googleplaystore.spoonfed.presentation.home_screen
 
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.googleplaystore.spoonfed.domain.models.Recipe
 import com.googleplaystore.spoonfed.domain.repository.RecipeRepository
 import com.googleplaystore.spoonfed.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,9 +21,11 @@ class HomeScreenViewModel @Inject constructor(
     private val repository: RecipeRepository
 ) : ViewModel() {
 
+    var searchQuery by mutableStateOf("")
+        private set
 
-    private val _uiState = MutableStateFlow(HomeScreenState())
-    val uiState: StateFlow<HomeScreenState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
+    val uiState: StateFlow<HomeUiState> = _uiState
 
 
     init {
@@ -29,7 +33,7 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     fun updateSearchQuery(query: String) {
-        _uiState.update { it.copy(searchQuery = query) }
+        searchQuery = query
 
     }
 
@@ -39,25 +43,11 @@ class HomeScreenViewModel @Inject constructor(
                 val result = repository.getRandomRecipes()
             ) {
                 is Resource.Success -> {
-                    result.data?.let { recipe ->
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                recipes = recipe.recipes,
-                                errorMessage = null
-                            )
-                        }
-                    }
+                    _uiState.value = HomeUiState.Success(result.data?.recipes)
 
                 }
                 is Resource.Error -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = result.message,
-                            hasError = true
-                        )
-                    }
+                    _uiState.value = HomeUiState.Error(result.message)
                 }
 
             }
@@ -72,28 +62,13 @@ class HomeScreenViewModel @Inject constructor(
         viewModelScope.launch {
             when (
                 val result = repository.getQueryRecipes(query = query)
-            ) {
+            ){
                 is Resource.Success -> {
-                    result.data?.let { recipe ->
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                recipes = recipe.results,
-                                errorMessage = null
-                            )
-                        }
-                    }
+                    _uiState.value = HomeUiState.Success(result.data?.results)
 
                 }
-
                 is Resource.Error -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = result.message,
-                            hasError = true
-                        )
-                    }
+                    _uiState.value = HomeUiState.Error(result.message)
                 }
 
             }
@@ -104,4 +79,8 @@ class HomeScreenViewModel @Inject constructor(
 }
 
 
-
+sealed interface HomeUiState {
+    data class Success(val recipes: List<Recipe>?) : HomeUiState
+    data class Error(val message: String? = "") : HomeUiState
+    object Loading : HomeUiState
+}
