@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.googleplaystore.spoonfed.R
-import com.googleplaystore.spoonfed.domain.models.Recipe
 import com.googleplaystore.spoonfed.presentation.components.RecipeCard
 import com.googleplaystore.spoonfed.presentation.components.ScrollToTopButton
 import com.googleplaystore.spoonfed.presentation.navigation.Screens
@@ -36,7 +35,7 @@ fun HomeScreen(
     navController: NavController,
     homeViewModel: HomeScreenViewModel = hiltViewModel()
 ) {
-    val state = homeViewModel.uiState.collectAsState().value
+    val homeUiState = homeViewModel.uiState.collectAsState().value
     val listState = rememberLazyGridState()
     val coroutineScope = rememberCoroutineScope()
     val showButton by remember {
@@ -68,18 +67,19 @@ fun HomeScreen(
 
 
             SearchBar(
-                foodName = state.searchQuery,
+                foodName = homeViewModel.searchQuery,
                 onFoodNameChange = { homeViewModel.updateSearchQuery(it) },
-                getQueryRecipe = { homeViewModel.getQueryRecipe(state.searchQuery) },
+                getQueryRecipe = { homeViewModel.getQueryRecipe(homeViewModel.searchQuery) },
                 scrollToTop = { coroutineScope.launch { listState.scrollToItem(0) } })
 
             RecipeItem(
-                recipe = state.recipes,
+                homeUiState = homeUiState,
                 navController = navController,
                 listState = listState
             )
 
         }
+
     }
 
 
@@ -89,18 +89,34 @@ fun HomeScreen(
 @Composable
 fun RecipeItem(
     navController: NavController,
-    recipe: List<Recipe>?,
+    homeUiState: HomeUiState,
     listState: LazyGridState
 ) {
 
     LazyVerticalGrid(
         state = listState,
         columns = GridCells.Adaptive(minSize = 128.dp),
-        contentPadding = PaddingValues(8.dp)
+        contentPadding = PaddingValues(8.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalArrangement = Arrangement.Center
     ) {
-        items(recipe ?: emptyList()) { recipe ->
-            RecipeCard(recipe = recipe) { navController.navigate(Screens.DetailScreen.route + "?recipeId=${recipe.id}") }
+        when (homeUiState) {
+            is HomeUiState.Loading -> {
+                //TODO fix loading wheel not centered to screen
+                item { HomeLoadingWheel() }
+
+            }
+            is HomeUiState.Error -> {
+                item { ErrorState(errorMessage = homeUiState.message) }
+
+            }
+            is HomeUiState.Success -> {
+                items(homeUiState.recipes ?: emptyList()) { recipe ->
+                    RecipeCard(recipe = recipe) { navController.navigate(Screens.DetailScreen.route + "?recipeId=${recipe.id}") }
+                }
+            }
         }
+
 
     }
 }
@@ -148,14 +164,14 @@ fun SearchBar(
 
 @Composable
 fun ErrorState(
-    errorMessage: String = "No Internet"
+    errorMessage: String?
 ) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = errorMessage)
+        Text(text = errorMessage ?: "No Internet")
     }
 }
 
