@@ -7,6 +7,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Singleton
 
 @Module
@@ -17,7 +18,8 @@ object RepositoryModule {
     @Singleton
     fun bindRecipeRepository(
         apiService: RecipeService,
+        @Dispatcher(NiaDispatchers.IO) ioDispatcher: CoroutineDispatcher,
     ): RecipeRepository {
-        return RecipeRepositoryImpl(apiService)
+        return RecipeRepositoryImpl(apiService, ioDispatcher)
     }
 }

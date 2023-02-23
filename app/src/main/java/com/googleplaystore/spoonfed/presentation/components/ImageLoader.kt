@@ -14,7 +14,7 @@ fun ImageLoader(
     modifier: Modifier,
     contentScale: ContentScale = ContentScale.FillBounds
 
-) {
+){
     AsyncImage(
         model = model,
         contentDescription = contentDescription,

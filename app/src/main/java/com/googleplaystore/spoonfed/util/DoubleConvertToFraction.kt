@@ -9,7 +9,7 @@ object DoubleConvertToFraction {
         val bigDecimal = BigDecimal(d)
         val intValue: Int = bigDecimal.toInt()
         var intString: String = intValue.toString()
-        if (intValue == 0) {
+        if(intValue == 0){
             intString = ""
         }
 

@@ -6,70 +6,81 @@ import com.googleplaystore.spoonfed.domain.models.Recipe
 import com.googleplaystore.spoonfed.domain.models.Recipes
 import com.googleplaystore.spoonfed.domain.repository.RecipeRepository
 import com.googleplaystore.spoonfed.util.Resource
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
 class RecipeRepositoryImpl @Inject constructor(
     private val apiService: RecipeService,
+    private val iODispatcher: CoroutineDispatcher
 ) : RecipeRepository {
 
     override suspend fun getRandomRecipes(): Resource<Recipes> {
-        return try {
-            val result = apiService.getRandomRecipes(number = 100)
+        return withContext(iODispatcher) {
+            try {
+                val result = apiService.getRandomRecipes(number = 100)
 
-            Resource.Success(result.toDomainModel())
+                Resource.Success(result.toDomainModel())
 
-        } catch (e: IOException) {
-            e.printStackTrace()
-            Resource.Error(
-                message = e.message.toString()
-            )
+            } catch (e: IOException) {
+                e.printStackTrace()
+                Resource.Error(
+                    message = e.message.toString()
+                )
 
-        } catch (e: HttpException) {
-            e.printStackTrace()
-            Resource.Error(
-                message = e.message()
-            )
+            } catch (e: HttpException) {
+                e.printStackTrace()
+                Resource.Error(
+                    message = e.message()
+                )
 
+            }
         }
+
     }
 
     override suspend fun getQueryRecipes(query: String): Resource<Recipes> {
-        return try {
-            val result = apiService.getQueryRecipes(number = 100, query = query)
-            Resource.Success(result.toDomainModel())
-        } catch (e: IOException) {
-            e.printStackTrace()
-            Resource.Error(
-                message = e.message.toString()
-            )
+        return withContext(iODispatcher) {
+            try {
+                val result = apiService.getQueryRecipes(number = 100, query = query)
+                Resource.Success(result.toDomainModel())
+            } catch (e: IOException) {
+                e.printStackTrace()
+                Resource.Error(
+                    message = e.message.toString()
+                )
 
-        } catch (e: HttpException) {
-            e.printStackTrace()
-            Resource.Error(
-                message = e.message()
-            )
+            } catch (e: HttpException) {
+                e.printStackTrace()
+                Resource.Error(
+                    message = e.message()
+                )
 
+            }
         }
     }
 
     override suspend fun getRecipeWithID(recipeID: Int): Resource<Recipe> {
-        return try {
-            val result = apiService.getRecipeByID(id = recipeID)
-            Resource.Success(result.toDomainModel())
-        } catch (e: IOException) {
-            e.printStackTrace()
-            Resource.Error(
-                message = e.message.toString()
-            )
+        return withContext(iODispatcher) {
+            try {
+                val result = apiService.getRecipeByID(id = recipeID)
+                Resource.Success(result.toDomainModel())
+            } catch (e: IOException) {
+                e.printStackTrace()
+                Resource.Error(
+                    message = e.message.toString()
+                )
 
-        } catch (e: HttpException) {
-            e.printStackTrace()
-            Resource.Error(
-                message = e.message()
-            )
+            } catch (e: HttpException) {
+                e.printStackTrace()
+                Resource.Error(
+                    message = e.message()
+                )
 
+            }
         }
+
     }
 }

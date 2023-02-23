@@ -11,4 +11,4 @@ data class Recipe(
     val servings: Int? = 0,
     val title: String? = "",
 
-    )
+)

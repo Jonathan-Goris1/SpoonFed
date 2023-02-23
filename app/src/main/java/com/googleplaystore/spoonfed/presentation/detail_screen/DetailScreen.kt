@@ -50,8 +50,7 @@ fun DetailScreen(
         }
     }
 
-    DetailItem(
-        recipe = state.recipe,
+    DetailItem(recipe = state.recipe,
         onNavigateBackToHomeScreen = { onNavigateBackToHomeScreen() },
         isExpanded = state.isExpanded,
         isExpandedText = state.expandedText,
@@ -152,13 +151,8 @@ fun DetailItem(
             }
             ingredientContent(ingredientsList = recipe?.extendedIngredients ?: emptyList())
 
-            item {
-                HeaderRow(
-                    text1 = stringResource(id = R.string.NutritionHeaderText),
-                    text2 = isExpandedText,
-                    onClick = { expandEvent() })
-            }
-            if (isExpanded) {
+            item { HeaderRow(text1 = stringResource(id = R.string.NutritionHeaderText), text2 = isExpandedText, onClick = {expandEvent()}) }
+            if(isExpanded){
                 nutrientsContent(nutrientList = recipe?.nutrition?.nutrients ?: emptyList())
             }
 
@@ -175,11 +169,7 @@ fun ImageProfile(
     title: String,
     image: String
 ) {
-    HeaderText(
-        text = title,
-        textAlign = TextAlign.Center,
-        modifier = Modifier.padding(start = 8.dp)
-    )
+    HeaderText(text = title, textAlign = TextAlign.Center, modifier = Modifier.padding(start = 8.dp) )
 
     ImageLoader(
         modifier = Modifier

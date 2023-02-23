@@ -11,14 +11,14 @@ interface RecipeService {
 
     @GET("recipes/random")
     suspend fun getRandomRecipes(
-        @Query("apiKey") apiKey: String = API_KEY,
+        @Query("apiKey") apiKey: String = API_KEY ,
         @Query("limitLicense") limitLicense: Boolean = true,
         @Query("number") number: Int
     ): RecipesResponse
 
     @GET("recipes/complexSearch")
     suspend fun getQueryRecipes(
-        @Query("apiKey") apiKey: String = API_KEY,
+        @Query("apiKey") apiKey: String = API_KEY ,
         @Query("query") query: String = "",
         @Query("number") number: Int
     ): RecipesResponse
