@@ -1,5 +1,6 @@
 package com.googleplaystore.spoonfed.presentation.home_screen
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -19,23 +20,44 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.googleplaystore.spoonfed.R
+import com.googleplaystore.spoonfed.domain.models.Recipe
 import com.googleplaystore.spoonfed.presentation.components.RecipeCard
 import com.googleplaystore.spoonfed.presentation.components.ScrollToTopButton
-import com.googleplaystore.spoonfed.presentation.navigation.Screens
 import kotlinx.coroutines.launch
 
 private const val TAG: String = "HOME_SCREEN"
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
-    navController: NavController,
+internal fun HomeRoute(
+    onRecipeClick: (Int) -> Unit,
+    modifier: Modifier = Modifier,
     homeViewModel: HomeScreenViewModel = hiltViewModel()
 ) {
     val homeUiState = homeViewModel.uiState.collectAsState().value
+    HomeScreen(
+        modifier = modifier,
+        foodName = homeViewModel.searchQuery,
+        onFoodNameChange = { homeViewModel.updateSearchQuery(homeViewModel.searchQuery) },
+        getQueryRecipe = { homeViewModel.getQueryRecipe(homeViewModel.searchQuery) },
+        homeUiState = homeUiState,
+        onRecipeClick = onRecipeClick
+    )
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun HomeScreen(
+    modifier: Modifier,
+    foodName: String,
+    onFoodNameChange: (String) -> Unit,
+    getQueryRecipe: (String) -> Unit,
+    homeUiState: HomeUiState,
+    onRecipeClick: (Int) -> Unit
+) {
+
     val listState = rememberLazyGridState()
     val coroutineScope = rememberCoroutineScope()
     val showButton by remember {
@@ -58,7 +80,7 @@ fun HomeScreen(
         }
     ) { paddingValues ->
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .padding(paddingValues),
             verticalArrangement = Arrangement.Center,
@@ -67,16 +89,29 @@ fun HomeScreen(
 
 
             SearchBar(
-                foodName = homeViewModel.searchQuery,
-                onFoodNameChange = { homeViewModel.updateSearchQuery(it) },
-                getQueryRecipe = { homeViewModel.getQueryRecipe(homeViewModel.searchQuery) },
+                modifier = modifier,
+                foodName = foodName,
+                onFoodNameChange = { onFoodNameChange(foodName) },
+                getQueryRecipe = { getQueryRecipe(foodName) },
                 scrollToTop = { coroutineScope.launch { listState.scrollToItem(0) } })
+            
+            when (homeUiState) {
+                is HomeUiState.Loading -> {
+                    HomeLoadingWheel()
+                }
+                is HomeUiState.Error -> {
+                    HomeErrorState(homeUiState.message)
+                }
+                is HomeUiState.Success -> {
+                    RecipeItem(
+                        recipe = homeUiState.recipes,
+                        listState = listState,
+                        onRecipeClick = onRecipeClick
+                    )
+                }
 
-            RecipeItem(
-                homeUiState = homeUiState,
-                navController = navController,
-                listState = listState
-            )
+            }
+
 
         }
 
@@ -88,9 +123,9 @@ fun HomeScreen(
 
 @Composable
 fun RecipeItem(
-    navController: NavController,
-    homeUiState: HomeUiState,
-    listState: LazyGridState
+    recipe: List<Recipe>?,
+    listState: LazyGridState,
+    onRecipeClick: (Int) -> Unit,
 ) {
 
     LazyVerticalGrid(
@@ -100,20 +135,11 @@ fun RecipeItem(
         verticalArrangement = Arrangement.Center,
         horizontalArrangement = Arrangement.Center
     ) {
-        when (homeUiState) {
-            is HomeUiState.Loading -> {
-                //TODO fix loading wheel not centered to screen
-                item { HomeLoadingWheel() }
 
-            }
-            is HomeUiState.Error -> {
-                item { ErrorState(errorMessage = homeUiState.message) }
-
-            }
-            is HomeUiState.Success -> {
-                items(homeUiState.recipes ?: emptyList()) { recipe ->
-                    RecipeCard(recipe = recipe) { navController.navigate(Screens.DetailScreen.route + "?recipeId=${recipe.id}") }
-                }
+        items(recipe ?: emptyList()) { recipe ->
+            RecipeCard(recipe = recipe) {
+                onRecipeClick(recipe.id ?: 0)
+                Log.d(TAG, "RecipeItem: ${recipe.id}")
             }
         }
 
@@ -125,6 +151,7 @@ fun RecipeItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(
+    modifier: Modifier,
     foodName: String,
     onFoodNameChange: (String) -> Unit,
     getQueryRecipe: (String) -> Unit,
@@ -155,7 +182,7 @@ fun SearchBar(
             containerColor = Color.Transparent
         ),
         shape = CircleShape,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
 
@@ -163,7 +190,7 @@ fun SearchBar(
 }
 
 @Composable
-fun ErrorState(
+fun HomeErrorState(
     errorMessage: String?
 ) {
     Column(
@@ -177,7 +204,9 @@ fun ErrorState(
 
 
 @Composable
-fun HomeLoadingWheel() {
+fun HomeLoadingWheel(
+
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -195,7 +224,7 @@ fun HomeLoadingWheel() {
 @Preview
 @Composable
 fun ErrorStatePreview() {
-    ErrorState(errorMessage = "No Internet available")
+    HomeErrorState(errorMessage = "No Internet available")
 }
 
 @Preview
