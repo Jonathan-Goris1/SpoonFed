@@ -1,19 +1,29 @@
 package com.googleplaystore.spoonfed.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun Navigator(){
-    val navController = rememberNavController()
+fun Navigator(
+    navController: NavHostController
+) {
     NavHost(
         navController = navController,
         startDestination = HOME_ROUTE
 
     ) {
 
-        homeNavGraph(navController = navController)
+        homeNavGraph(
+            onRecipeClick = { recipeID ->
+                navController.navigateToDetail(recipeID)
+            },
+            nestedGraphs = {
+                detailScreen(
+                    onBackClick = navController::popBackStack
+                )
+            }
+        )
 
     }
 
