@@ -35,13 +35,14 @@ import com.googleplaystore.spoonfed.presentation.components.ScrollToTopButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-
 @Composable
-fun DetailScreen(
-    onNavigateBackToHomeScreen: () -> Boolean,
+internal fun DetailRoute(
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
     detailViewModel: DetailScreenViewModel = hiltViewModel()
 ) {
-    val state = detailViewModel.uiState.collectAsState().value
+    val detailUIState = detailViewModel.uiState.collectAsState().value
+
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val showButton by remember {
@@ -49,23 +50,58 @@ fun DetailScreen(
             listState.firstVisibleItemIndex > 0
         }
     }
-
-    DetailItem(recipe = state.recipe,
-        onNavigateBackToHomeScreen = { onNavigateBackToHomeScreen() },
-        isExpanded = state.isExpanded,
-        isExpandedText = state.expandedText,
-        expandEvent = { detailViewModel.isExpandedView(notExpanded = !state.isExpanded) },
-        coroutineScope = coroutineScope,
+    DetailScreen(
+        onBackClick = onBackClick,
+        detailUIState = detailUIState,
+        isExpanded = detailViewModel.isExpanded,
+        isExpandedText = detailViewModel.expandedText,
+        expandEvent = { detailViewModel.isExpandedView(!detailViewModel.isExpanded) },
         showButton = showButton,
-        listState = listState
+        listState = listState,
+        coroutineScope = coroutineScope
+
+
     )
+}
+
+@Composable
+internal fun DetailScreen(
+    onBackClick: () -> Unit,
+    detailUIState: DetailUiState,
+    isExpanded: Boolean,
+    isExpandedText: String,
+    expandEvent: () -> Unit,
+    showButton: Boolean,
+    listState: LazyListState,
+    coroutineScope: CoroutineScope
+) {
+    when (detailUIState) {
+        is DetailUiState.Loading -> {
+            DetailLoadingWheel()
+        }
+        is DetailUiState.Error -> {
+            DetailErrorState(detailUIState.message)
+        }
+        is DetailUiState.Success -> {
+            DetailItem(
+                onBackClick = onBackClick,
+                recipe = detailUIState.recipes,
+                isExpanded = isExpanded,
+                isExpandedText = isExpandedText,
+                expandEvent = expandEvent,
+                showButton = showButton,
+                listState = listState,
+                coroutineScope = coroutineScope
+            )
+        }
+    }
 
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailItem(
-    onNavigateBackToHomeScreen: () -> Boolean,
+    onBackClick: () -> Unit,
     recipe: Recipe?,
     isExpanded: Boolean,
     isExpandedText: String,
@@ -102,7 +138,7 @@ fun DetailItem(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = { onNavigateBackToHomeScreen() }) {
+                    IconButton(onClick = { onBackClick() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = stringResource(id = R.string.GoBack)
@@ -151,8 +187,13 @@ fun DetailItem(
             }
             ingredientContent(ingredientsList = recipe?.extendedIngredients ?: emptyList())
 
-            item { HeaderRow(text1 = stringResource(id = R.string.NutritionHeaderText), text2 = isExpandedText, onClick = {expandEvent()}) }
-            if(isExpanded){
+            item {
+                HeaderRow(
+                    text1 = stringResource(id = R.string.NutritionHeaderText),
+                    text2 = isExpandedText,
+                    onClick = { expandEvent() })
+            }
+            if (isExpanded) {
                 nutrientsContent(nutrientList = recipe?.nutrition?.nutrients ?: emptyList())
             }
 
@@ -169,7 +210,11 @@ fun ImageProfile(
     title: String,
     image: String
 ) {
-    HeaderText(text = title, textAlign = TextAlign.Center, modifier = Modifier.padding(start = 8.dp) )
+    HeaderText(
+        text = title,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.padding(start = 8.dp)
+    )
 
     ImageLoader(
         modifier = Modifier
@@ -312,6 +357,35 @@ fun PreparationSection(
         }
 
     }
-
-
 }
+
+@Composable
+fun DetailLoadingWheel(
+
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(64.dp),
+            color = Color.White,
+            strokeWidth = 4.dp
+        )
+    }
+}
+
+@Composable
+fun DetailErrorState(
+    errorMessage: String?
+) {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = errorMessage ?: "No Internet")
+    }
+}
+
