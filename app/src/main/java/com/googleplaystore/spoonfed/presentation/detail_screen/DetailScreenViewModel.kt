@@ -1,37 +1,47 @@
 package com.googleplaystore.spoonfed.presentation.detail_screen
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.googleplaystore.spoonfed.domain.models.Recipe
 import com.googleplaystore.spoonfed.domain.repository.RecipeRepository
 import com.googleplaystore.spoonfed.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+private const val TAG: String = "Detail_ViewModel"
 @HiltViewModel
 class DetailScreenViewModel @Inject constructor(
     private val repository: RecipeRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(DetailScreenState(isLoading = true))
-    val uiState: StateFlow<DetailScreenState> = _uiState.asStateFlow()
-    private val recipeID: Int = savedStateHandle.get<Int>("recipeId")!!
 
+    var expandedText by mutableStateOf("")
+        private set
+
+    var isExpanded by mutableStateOf(false)
+        private set
+
+    private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Loading)
+    val uiState: StateFlow<DetailUiState> = _uiState
+
+    private val recipeID: Int = checkNotNull(savedStateHandle["recipeId"])
 
     init {
         getRecipeByID()
     }
     fun isExpandedView(notExpanded: Boolean){
-        _uiState.update { it.copy(isExpanded = notExpanded) }
+        isExpanded = notExpanded
         if(notExpanded){
-            _uiState.update { it.copy(expandedText = "Hide Info -") }
+            expandedText = "Hide Info -"
         }else{
-            _uiState.update { it.copy(expandedText = "View Info +") }
+            expandedText = "View Info +"
         }
     }
 
@@ -40,32 +50,21 @@ class DetailScreenViewModel @Inject constructor(
             when (
                 val result = repository.getRecipeWithID(recipeID = recipeID)
             ) {
-                is Resource.Success -> {
-                    result.data?.let { recipe ->
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                recipe = recipe,
-                                errorMessage = null,
-                                expandedText = "View Info +"
-                            )
-                        }
-                    }
-
-                }
-
+               is Resource.Success -> {
+                   _uiState.value = DetailUiState.Success(result.data)
+               }
                 is Resource.Error -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = result.message,
-                            hasError = true
-                        )
-                    }
+                    _uiState.value = DetailUiState.Error(result.message)
                 }
 
             }
         }
 
     }
+}
+
+sealed interface DetailUiState {
+    data class Success(val recipes: Recipe?) : DetailUiState
+    data class Error(val message: String? = "") : DetailUiState
+    object Loading : DetailUiState
 }
