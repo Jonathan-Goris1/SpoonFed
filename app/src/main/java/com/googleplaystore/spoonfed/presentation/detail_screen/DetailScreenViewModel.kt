@@ -15,14 +15,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-private const val TAG: String = "Detail_ViewModel"
+
 @HiltViewModel
 class DetailScreenViewModel @Inject constructor(
     private val repository: RecipeRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    var expandedText by mutableStateOf("")
+    var expandedText by mutableStateOf("View Info +")
         private set
 
     var isExpanded by mutableStateOf(false)
@@ -38,10 +38,10 @@ class DetailScreenViewModel @Inject constructor(
     }
     fun isExpandedView(notExpanded: Boolean){
         isExpanded = notExpanded
-        if(notExpanded){
-            expandedText = "Hide Info -"
+        expandedText = if(notExpanded){
+            "Hide Info -"
         }else{
-            expandedText = "View Info +"
+            "View Info +"
         }
     }
 
