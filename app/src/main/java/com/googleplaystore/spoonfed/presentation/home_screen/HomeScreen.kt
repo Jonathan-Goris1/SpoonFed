@@ -47,7 +47,7 @@ internal fun HomeRoute(
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 internal fun HomeScreen(
     modifier: Modifier,
@@ -129,11 +129,15 @@ fun RecipeItem(
 ) {
 
     LazyVerticalGrid(
+        modifier = Modifier
+            .padding(vertical = 8.dp, horizontal = 16.dp)
+            .fillMaxWidth(),
         state = listState,
-        columns = GridCells.Adaptive(minSize = 128.dp),
-        contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalArrangement = Arrangement.Center
+        columns = GridCells.Fixed(2),
+        contentPadding = PaddingValues(0.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+
     ) {
 
         items(recipe ?: emptyList()) { recipe ->
@@ -169,7 +173,7 @@ fun SearchBar(
                 text = stringResource(id = R.string.SearchForRecipesText)
             )
         },
-        //TODO When triggering KeyboardAction, the list doesn't scroll back to top position.
+
         keyboardActions = KeyboardActions { getQueryRecipe(foodName); scrollToTop() },
         leadingIcon = {
             Icon(
@@ -178,7 +182,6 @@ fun SearchBar(
             )
         },
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            placeholderColor = Color.LightGray,
             containerColor = Color.Transparent
         ),
         shape = CircleShape,
