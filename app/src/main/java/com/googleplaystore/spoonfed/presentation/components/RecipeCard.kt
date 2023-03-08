@@ -1,13 +1,12 @@
 package com.googleplaystore.spoonfed.presentation.components
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -21,14 +20,16 @@ fun RecipeCard(
     recipe: Recipe?,
     onClick: () -> Unit
 ) {
-    Column(modifier = modifier
-           .padding(horizontal = 0.dp, vertical = 8.dp)
-            .clickable(onClick = onClick)) {
+    Column(
+        modifier = modifier
+            .clickable(onClick = onClick)
+    ) {
 
         ImageLoader(
             modifier = modifier
-                .width(120.dp)
-                .height(100.dp),
+                .fillMaxWidth()
+                .height(160.dp)
+                .clip(RoundedCornerShape(8.dp)),
             model = recipe?.image,
             contentDescription = recipe?.title,
             contentScale = ContentScale.FillBounds
@@ -41,8 +42,8 @@ fun RecipeCard(
             lineHeight = 1.em,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
-                .padding(horizontal = 4.dp, vertical = 4.dp)
-                .width(120.dp)
+                .padding(start = 4.dp, top = 4.dp, end = 0.dp, bottom = 0.dp)
+                .fillMaxWidth()
         )
     }
 
