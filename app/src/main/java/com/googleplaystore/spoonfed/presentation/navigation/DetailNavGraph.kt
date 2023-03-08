@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.googleplaystore.spoonfed.presentation.detail_screen.DetailRoute
 
-internal const val recipeIdArg = "recipeId"
+const val recipeIdArg = "recipeId"
 
 fun NavController.navigateToDetail(recipeId: Int) {
     this.navigate("${Screens.DetailScreen.route}?recipeId={$recipeId}")
@@ -22,7 +22,7 @@ fun NavGraphBuilder.detailScreen(
         arguments = listOf(
             navArgument(recipeIdArg) {
                 type = NavType.IntType
-                defaultValue = 0
+                defaultValue = 649977
             }
         )
 
