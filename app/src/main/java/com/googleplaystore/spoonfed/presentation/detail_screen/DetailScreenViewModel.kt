@@ -31,7 +31,7 @@ class DetailScreenViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Loading)
     val uiState: StateFlow<DetailUiState> = _uiState
 
-    private val recipeID: Int = checkNotNull(savedStateHandle["recipeId"])
+     val recipeID: Int = checkNotNull(savedStateHandle["recipeId"])
 
     init {
         getRecipeByID()
