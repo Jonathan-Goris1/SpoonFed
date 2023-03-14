@@ -1,7 +1,10 @@
 package com.googleplaystore.spoonfed.presentation.detail_screen
 
+import android.os.Build
+import android.util.Log
 import android.view.View
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -21,7 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
@@ -35,10 +37,13 @@ import com.googleplaystore.spoonfed.presentation.components.ScrollToTopButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+private const val TAG: String = "DetailScreen"
+
+@RequiresApi(Build.VERSION_CODES.M)
 @Composable
 internal fun DetailRoute(
     onBackClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     detailViewModel: DetailScreenViewModel = hiltViewModel()
 ) {
     val detailUIState = detailViewModel.uiState.collectAsState().value
@@ -50,7 +55,9 @@ internal fun DetailRoute(
             listState.firstVisibleItemIndex > 0
         }
     }
+    Log.d(TAG, "DetailRoute: ${detailViewModel.recipeID}")
     DetailScreen(
+        modifier = modifier,
         onBackClick = onBackClick,
         detailUIState = detailUIState,
         isExpanded = detailViewModel.isExpanded,
@@ -64,8 +71,10 @@ internal fun DetailRoute(
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.M)
 @Composable
 internal fun DetailScreen(
+    modifier: Modifier,
     onBackClick: () -> Unit,
     detailUIState: DetailUiState,
     isExpanded: Boolean,
@@ -77,13 +86,14 @@ internal fun DetailScreen(
 ) {
     when (detailUIState) {
         is DetailUiState.Loading -> {
-            DetailLoadingWheel()
+            DetailLoadingWheel(modifier = modifier)
         }
         is DetailUiState.Error -> {
-            DetailErrorState(detailUIState.message)
+            DetailErrorState(errorMessage = detailUIState.message, modifier = modifier)
         }
         is DetailUiState.Success -> {
             DetailItem(
+                modifier = modifier,
                 onBackClick = onBackClick,
                 recipe = detailUIState.recipes,
                 isExpanded = isExpanded,
@@ -98,9 +108,11 @@ internal fun DetailScreen(
 
 }
 
+@RequiresApi(Build.VERSION_CODES.M)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailItem(
+    modifier: Modifier,
     onBackClick: () -> Unit,
     recipe: Recipe?,
     isExpanded: Boolean,
@@ -126,14 +138,13 @@ fun DetailItem(
             TopAppBar(
                 title = {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
+                        HeaderText(
                             text = recipe?.title ?: "",
-                            color = Color.White,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            textAlign = TextAlign.Center,
+                            maxLines = 1
                         )
                     }
                 },
@@ -153,13 +164,13 @@ fun DetailItem(
 
                 actions = {
                     IconButton(
-                        modifier = Modifier
+                        modifier = modifier
                             .clip(CircleShape)
                             .background(Color.White)
                             .size(30.dp, 30.dp),
                         onClick = { /* doSomething() */ }) {
                         Icon(
-                            modifier = Modifier.size(20.dp, 20.dp),
+                            modifier = modifier.size(20.dp, 20.dp),
                             imageVector = Icons.Filled.Share,
                             contentDescription = stringResource(id = R.string.ShareRecipeContentDescription)
                         )
@@ -174,18 +185,18 @@ fun DetailItem(
     ) { paddingValues ->
         LazyColumn(
             state = listState,
-            modifier = Modifier
+            modifier = modifier
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            item { ImageProfile(title = recipe?.title ?: "", image = recipe?.image ?: "") }
+            item { ImageProfile(title = recipe?.title ?: "", image = recipe?.image ?: "", modifier = modifier) }
             item {
                 HeaderRow(
                     text1 = stringResource(id = R.string.IngredientsHeaderText),
                     text2 = "${recipe?.servings ?: 0} ${stringResource(id = R.string.ServingsHeaderText)}",
                 )
             }
-            ingredientContent(ingredientsList = recipe?.extendedIngredients ?: emptyList())
+            ingredientContent(ingredientsList = recipe?.extendedIngredients ?: emptyList(), modifier = modifier)
 
             item {
                 HeaderRow(
@@ -194,11 +205,11 @@ fun DetailItem(
                     onClick = { expandEvent() })
             }
             if (isExpanded) {
-                nutrientsContent(nutrientList = recipe?.nutrition?.nutrients ?: emptyList())
+                nutrientsContent(nutrientList = recipe?.nutrition?.nutrients ?: emptyList(), modifier = modifier)
             }
 
             item { HeaderRow(text1 = stringResource(id = R.string.PreparationHeaderText)) }
-            preparationContent(instructions = recipe?.analyzedInstructions ?: emptyList())
+            preparationContent(instructions = recipe?.analyzedInstructions ?: emptyList(), modifier = modifier)
 
         }
 
@@ -207,17 +218,19 @@ fun DetailItem(
 
 @Composable
 fun ImageProfile(
+    modifier: Modifier,
     title: String,
     image: String
 ) {
     HeaderText(
         text = title,
         textAlign = TextAlign.Center,
-        modifier = Modifier.padding(start = 8.dp)
+        modifier = modifier.padding(start = 8.dp),
+        maxLines = 4,
     )
 
     ImageLoader(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(250.dp),
         model = image,
@@ -227,20 +240,24 @@ fun ImageProfile(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.M)
 fun LazyListScope.ingredientContent(
+    modifier: Modifier,
     ingredientsList: List<ExtendedIngredient>
 ) {
     items(ingredientsList) { ingredient ->
-        IngredientSection(ingredients = ingredient)
+        IngredientSection(ingredients = ingredient, modifier = modifier)
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.M)
 @Composable
 fun IngredientSection(
+    modifier: Modifier,
     ingredients: ExtendedIngredient
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .padding(8.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -250,7 +267,7 @@ fun IngredientSection(
             textAlign = TextAlign.Start,
             text = ingredients.name ?: ""
         )
-        Spacer(Modifier.weight(1f))
+        Spacer(modifier.weight(1f))
 
 
         AndroidView(factory = { context ->
@@ -261,7 +278,7 @@ fun IngredientSection(
                         HtmlCompat.FROM_HTML_MODE_LEGACY
                     )
                 }"
-                setTextColor(resources.getColor(R.color.white))
+                setTextColor(resources.getColor(R.color.black, resources.newTheme()))
                 textSize = 16f
                 textAlignment = View.TEXT_ALIGNMENT_TEXT_END
             }
@@ -273,7 +290,7 @@ fun IngredientSection(
         )
     }
     Divider(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         thickness = 1.dp,
         color = Color.DarkGray
     )
@@ -281,19 +298,21 @@ fun IngredientSection(
 
 
 fun LazyListScope.nutrientsContent(
+    modifier: Modifier,
     nutrientList: List<NutrientX>
 ) {
     items(nutrientList) { nutrient ->
-        NutrientsSection(nutrient = nutrient)
+        NutrientsSection(nutrient = nutrient, modifier = modifier)
     }
 }
 
 @Composable
 fun NutrientsSection(
+    modifier: Modifier,
     nutrient: NutrientX
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .padding(8.dp)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -303,7 +322,7 @@ fun NutrientsSection(
             textAlign = TextAlign.Start,
             text = nutrient.name ?: ""
         )
-        Spacer(Modifier.weight(1f))
+        Spacer(modifier.weight(1f))
 
         Text(
             textAlign = TextAlign.End,
@@ -311,18 +330,19 @@ fun NutrientsSection(
         )
     }
     Divider(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         thickness = 1.dp,
         color = Color.DarkGray
     )
 }
 
 fun LazyListScope.preparationContent(
+    modifier: Modifier,
     instructions: List<AnalyzedInstruction>
 ) {
     items(instructions) { instruction ->
         for (element in instruction.steps!!) {
-            PreparationSection(step = element)
+            PreparationSection(step = element, modifier = modifier)
         }
 
 
@@ -332,23 +352,24 @@ fun LazyListScope.preparationContent(
 
 @Composable
 fun PreparationSection(
+    modifier: Modifier,
     step: Step
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(4.dp)
 
     ) {
         Row(
-            modifier = Modifier
+            modifier = modifier
                 .padding(8.dp),
         ) {
             Text(
-                modifier = Modifier.padding(start = 8.dp),
+                modifier = modifier.padding(start = 8.dp),
                 text = "${step.number}"
             )
-            Spacer(modifier = Modifier.padding(horizontal = 8.dp))
+            Spacer(modifier = modifier.padding(horizontal = 8.dp))
 
             Text(
                 text = step.step ?: "",
@@ -361,15 +382,15 @@ fun PreparationSection(
 
 @Composable
 fun DetailLoadingWheel(
-
+    modifier: Modifier
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CircularProgressIndicator(
-            modifier = Modifier.size(64.dp),
+            modifier = modifier.size(64.dp),
             color = Color.White,
             strokeWidth = 4.dp
         )
@@ -378,10 +399,11 @@ fun DetailLoadingWheel(
 
 @Composable
 fun DetailErrorState(
+    modifier: Modifier,
     errorMessage: String?
 ) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
