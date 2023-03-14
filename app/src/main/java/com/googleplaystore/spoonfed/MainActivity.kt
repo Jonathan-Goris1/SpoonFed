@@ -8,7 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import com.googleplaystore.spoonfed.presentation.navigation.Navigator
+import com.googleplaystore.spoonfed.presentation.navigation.AppNavHost
 import com.googleplaystore.spoonfed.ui.theme.SpoonFedTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    Navigator(navController)
+                    AppNavHost(navController)
                 }
             }
         }
