@@ -1,5 +1,8 @@
 package com.googleplaystore.spoonfed.presentation.navigation
 
+import android.util.Log
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -8,13 +11,15 @@ import androidx.navigation.navArgument
 import com.googleplaystore.spoonfed.presentation.detail_screen.DetailRoute
 
 const val recipeIdArg = "recipeId"
-
+private const val TAG = "detailNavGraph"
 fun NavController.navigateToDetail(recipeId: Int) {
+    Log.d(TAG, "navigateToDetail: $recipeId")
     this.navigate("${Screens.DetailScreen.route}?recipeId={$recipeId}")
 }
 
 
-fun NavGraphBuilder.detailScreen(
+
+fun NavGraphBuilder.detailNavGraph(
     onBackClick: () -> Unit,
 ) {
     composable(
@@ -27,7 +32,7 @@ fun NavGraphBuilder.detailScreen(
         )
 
     ) {
-        DetailRoute(onBackClick = onBackClick)
+        DetailRoute(onBackClick = onBackClick, modifier = Modifier)
     }
 
 }
