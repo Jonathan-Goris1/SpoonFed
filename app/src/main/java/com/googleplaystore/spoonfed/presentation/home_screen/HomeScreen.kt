@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.googleplaystore.spoonfed.R
 import com.googleplaystore.spoonfed.domain.models.Recipe
@@ -32,7 +33,7 @@ private const val TAG: String = "HOME_SCREEN"
 @Composable
 internal fun HomeRoute(
     onRecipeClick: (Int) -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
     homeViewModel: HomeScreenViewModel = hiltViewModel()
 ) {
     val homeUiState = homeViewModel.uiState.collectAsState().value
@@ -97,13 +98,14 @@ internal fun HomeScreen(
             
             when (homeUiState) {
                 is HomeUiState.Loading -> {
-                    HomeLoadingWheel()
+                    HomeLoadingWheel(modifier = modifier)
                 }
                 is HomeUiState.Error -> {
-                    HomeErrorState(homeUiState.message)
+                    HomeErrorState(modifier = modifier,errorMessage = homeUiState.message)
                 }
                 is HomeUiState.Success -> {
                     RecipeItem(
+                        modifier = modifier,
                         recipe = homeUiState.recipes,
                         listState = listState,
                         onRecipeClick = onRecipeClick
@@ -123,13 +125,14 @@ internal fun HomeScreen(
 
 @Composable
 fun RecipeItem(
+    modifier: Modifier,
     recipe: List<Recipe>?,
     listState: LazyGridState,
     onRecipeClick: (Int) -> Unit,
 ) {
 
     LazyVerticalGrid(
-        modifier = Modifier
+        modifier = modifier
             .padding(vertical = 8.dp, horizontal = 16.dp)
             .fillMaxWidth(),
         state = listState,
@@ -170,6 +173,7 @@ fun SearchBar(
         textStyle = TextStyle(color = Color.White),
         placeholder = {
             Text(
+                fontSize = 18.sp,
                 text = stringResource(id = R.string.SearchForRecipesText)
             )
         },
@@ -186,6 +190,7 @@ fun SearchBar(
         ),
         shape = CircleShape,
         modifier = modifier
+            .height(70.dp)
             .fillMaxWidth()
             .padding(8.dp)
 
@@ -194,10 +199,11 @@ fun SearchBar(
 
 @Composable
 fun HomeErrorState(
+    modifier: Modifier,
     errorMessage: String?
 ) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -208,16 +214,16 @@ fun HomeErrorState(
 
 @Composable
 fun HomeLoadingWheel(
-
+    modifier: Modifier
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CircularProgressIndicator(
-            modifier = Modifier.size(64.dp),
-            color = Color.White,
+            modifier = modifier.size(64.dp),
+            color = MaterialTheme.colorScheme.onSurface,
             strokeWidth = 4.dp
         )
     }
@@ -226,12 +232,23 @@ fun HomeLoadingWheel(
 
 @Preview
 @Composable
+fun SearchBarPreview(){
+    SearchBar(
+        modifier = Modifier,
+        foodName = "",
+        onFoodNameChange = {},
+        getQueryRecipe = {},
+        scrollToTop = {}
+    )
+}
+@Preview
+@Composable
 fun ErrorStatePreview() {
-    HomeErrorState(errorMessage = "No Internet available")
+    HomeErrorState(errorMessage = "No Internet available", modifier = Modifier)
 }
 
 @Preview
 @Composable
 fun LoadingPreview() {
-    HomeLoadingWheel()
+    HomeLoadingWheel(modifier = Modifier)
 }
