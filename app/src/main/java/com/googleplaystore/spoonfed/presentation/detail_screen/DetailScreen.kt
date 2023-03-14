@@ -137,16 +137,7 @@ fun DetailItem(
         topBar = {
             TopAppBar(
                 title = {
-                    Box(
-                        modifier = modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        HeaderText(
-                            text = recipe?.title ?: "",
-                            textAlign = TextAlign.Center,
-                            maxLines = 1
-                        )
-                    }
+
                 },
                 navigationIcon = {
                     IconButton(onClick = { onBackClick() }) {
