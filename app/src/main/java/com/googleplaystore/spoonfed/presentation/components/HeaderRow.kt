@@ -17,28 +17,31 @@ fun HeaderRow(
     text1: String = "",
     text2: String = "",
     onClick: () -> Unit = {}
-){
+) {
     Row(
         modifier = Modifier
             .padding(8.dp)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
-            ){onClick()},
+            ) { onClick() },
         verticalAlignment = Alignment.CenterVertically
     ) {
 
         HeaderText(
             textAlign = TextAlign.Start,
             text = text1,
-            )
+            maxLines = 1
+        )
         Spacer(Modifier.weight(1f))
 
-        if(text2.isNotBlank()){HeaderText(
-            textAlign = TextAlign.End,
-            text = text2
-        )}
-
+        if (text2.isNotBlank()) {
+            HeaderText(
+                textAlign = TextAlign.End,
+                text = text2,
+                maxLines = 1
+            )
+        }
 
 
     }
