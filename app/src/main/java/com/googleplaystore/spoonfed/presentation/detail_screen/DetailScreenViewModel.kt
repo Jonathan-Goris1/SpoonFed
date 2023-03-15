@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.googleplaystore.spoonfed.domain.models.Recipe
 import com.googleplaystore.spoonfed.domain.repository.RecipeRepository
-import com.googleplaystore.spoonfed.util.Resource
+import com.googleplaystore.spoonfed.util.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,10 +50,10 @@ class DetailScreenViewModel @Inject constructor(
             when (
                 val result = repository.getRecipeWithID(recipeID = recipeID)
             ) {
-               is Resource.Success -> {
+               is Result.Success -> {
                    _uiState.value = DetailUiState.Success(result.data)
                }
-                is Resource.Error -> {
+                is Result.Error -> {
                     _uiState.value = DetailUiState.Error(result.message)
                 }
 

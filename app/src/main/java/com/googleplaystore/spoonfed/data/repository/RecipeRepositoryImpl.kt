@@ -5,7 +5,7 @@ import com.googleplaystore.spoonfed.data.remote.service.RecipeService
 import com.googleplaystore.spoonfed.domain.models.Recipe
 import com.googleplaystore.spoonfed.domain.models.Recipes
 import com.googleplaystore.spoonfed.domain.repository.RecipeRepository
-import com.googleplaystore.spoonfed.util.Resource
+import com.googleplaystore.spoonfed.util.Result
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -17,22 +17,22 @@ class RecipeRepositoryImpl @Inject constructor(
     private val iODispatcher: CoroutineDispatcher
 ) : RecipeRepository {
 
-    override suspend fun getRandomRecipes(): Resource<Recipes> {
+    override suspend fun getRandomRecipes(): Result<Recipes> {
         return withContext(iODispatcher) {
             try {
                 val result = apiService.getRandomRecipes(number = 100)
 
-                Resource.Success(result.toDomainModel())
+                Result.Success(result.toDomainModel())
 
             } catch (e: IOException) {
                 e.printStackTrace()
-                Resource.Error(
+                Result.Error(
                     message = e.message.toString()
                 )
 
             } catch (e: HttpException) {
                 e.printStackTrace()
-                Resource.Error(
+                Result.Error(
                     message = e.message()
                 )
 
@@ -41,20 +41,20 @@ class RecipeRepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun getQueryRecipes(query: String): Resource<Recipes> {
+    override suspend fun getQueryRecipes(query: String): Result<Recipes> {
         return withContext(iODispatcher) {
             try {
                 val result = apiService.getQueryRecipes(number = 100, query = query)
-                Resource.Success(result.toDomainModel())
+                Result.Success(result.toDomainModel())
             } catch (e: IOException) {
                 e.printStackTrace()
-                Resource.Error(
+                Result.Error(
                     message = e.message.toString()
                 )
 
             } catch (e: HttpException) {
                 e.printStackTrace()
-                Resource.Error(
+                Result.Error(
                     message = e.message()
                 )
 
@@ -62,20 +62,20 @@ class RecipeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getRecipeWithID(recipeID: Int): Resource<Recipe> {
+    override suspend fun getRecipeWithID(recipeID: Int): Result<Recipe> {
         return withContext(iODispatcher) {
             try {
                 val result = apiService.getRecipeByID(id = recipeID)
-                Resource.Success(result.toDomainModel())
+                Result.Success(result.toDomainModel())
             } catch (e: IOException) {
                 e.printStackTrace()
-                Resource.Error(
+                Result.Error(
                     message = e.message.toString()
                 )
 
             } catch (e: HttpException) {
                 e.printStackTrace()
-                Resource.Error(
+                Result.Error(
                     message = e.message()
                 )
 

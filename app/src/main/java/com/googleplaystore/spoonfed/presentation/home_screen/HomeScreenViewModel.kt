@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.googleplaystore.spoonfed.domain.models.Recipe
 import com.googleplaystore.spoonfed.domain.repository.RecipeRepository
-import com.googleplaystore.spoonfed.util.Resource
+import com.googleplaystore.spoonfed.util.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,11 +42,11 @@ class HomeScreenViewModel @Inject constructor(
             when (
                 val result = repository.getRandomRecipes()
             ) {
-                is Resource.Success -> {
+                is Result.Success -> {
                     _uiState.value = HomeUiState.Success(result.data?.recipes)
 
                 }
-                is Resource.Error -> {
+                is Result.Error -> {
                     _uiState.value = HomeUiState.Error(result.message)
                 }
 
@@ -63,11 +63,11 @@ class HomeScreenViewModel @Inject constructor(
             when (
                 val result = repository.getQueryRecipes(query = query)
             ){
-                is Resource.Success -> {
+                is Result.Success -> {
                     _uiState.value = HomeUiState.Success(result.data?.results)
 
                 }
-                is Resource.Error -> {
+                is Result.Error -> {
                     _uiState.value = HomeUiState.Error(result.message)
                 }
 

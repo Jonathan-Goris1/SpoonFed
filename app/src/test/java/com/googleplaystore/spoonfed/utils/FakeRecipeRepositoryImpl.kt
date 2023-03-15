@@ -3,7 +3,7 @@ package com.googleplaystore.spoonfed.utils
 import com.googleplaystore.spoonfed.domain.models.Recipe
 import com.googleplaystore.spoonfed.domain.models.Recipes
 import com.googleplaystore.spoonfed.domain.repository.RecipeRepository
-import com.googleplaystore.spoonfed.util.Resource
+import com.googleplaystore.spoonfed.util.Result
 import javax.inject.Inject
 
 class FakeRecipeRepositoryImpl @Inject constructor() : RecipeRepository {
@@ -33,15 +33,15 @@ class FakeRecipeRepositoryImpl @Inject constructor() : RecipeRepository {
         recipes = fakeRecipe, results = fakeRecipe
     )
 
-    override suspend fun getRandomRecipes(): Resource<Recipes> {
-        return Resource.Success(data = randomRecipe)
+    override suspend fun getRandomRecipes(): Result<Recipes> {
+        return Result.Success(data = randomRecipe)
     }
 
-    override suspend fun getQueryRecipes(query: String): Resource<Recipes> {
-        return Resource.Success(data = randomRecipe)
+    override suspend fun getQueryRecipes(query: String): Result<Recipes> {
+        return Result.Success(data = randomRecipe)
     }
 
-    override suspend fun getRecipeWithID(recipeID: Int): Resource<Recipe> {
-        return Resource.Success(recipeByID)
+    override suspend fun getRecipeWithID(recipeID: Int): Result<Recipe> {
+        return Result.Success(recipeByID)
     }
 }
