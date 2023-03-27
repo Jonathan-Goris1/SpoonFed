@@ -1,9 +1,6 @@
 package com.googleplaystore.spoonfed.presentation.home_screen
 
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.googleplaystore.spoonfed.domain.models.Recipe
@@ -12,6 +9,7 @@ import com.googleplaystore.spoonfed.util.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,8 +19,10 @@ class HomeScreenViewModel @Inject constructor(
     private val repository: RecipeRepository
 ) : ViewModel() {
 
-    var searchQuery by mutableStateOf("")
-        private set
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery = _searchQuery.asStateFlow()
+
+
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState
@@ -33,7 +33,7 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     fun updateSearchQuery(query: String) {
-        searchQuery = query
+        _searchQuery.value = query
 
     }
 
