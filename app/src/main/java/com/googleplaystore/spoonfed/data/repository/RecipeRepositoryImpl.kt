@@ -27,13 +27,13 @@ class RecipeRepositoryImpl @Inject constructor(
             } catch (e: IOException) {
                 e.printStackTrace()
                 Result.Error(
-                    message = e.message.toString()
+                    message = "No Internet Connection"
                 )
 
             } catch (e: HttpException) {
                 e.printStackTrace()
                 Result.Error(
-                    message = e.message()
+                    message = "${e.message.toString()} HttpException"
                 )
 
             }
@@ -49,13 +49,13 @@ class RecipeRepositoryImpl @Inject constructor(
             } catch (e: IOException) {
                 e.printStackTrace()
                 Result.Error(
-                    message = e.message.toString()
+                    message = "${e.message.toString()} IOException"
                 )
 
             } catch (e: HttpException) {
                 e.printStackTrace()
                 Result.Error(
-                    message = e.message()
+                    message = "${e.message.toString()} HttpException"
                 )
 
             }
@@ -70,13 +70,13 @@ class RecipeRepositoryImpl @Inject constructor(
             } catch (e: IOException) {
                 e.printStackTrace()
                 Result.Error(
-                    message = e.message.toString()
+                    message = "${e.message.toString()} IOException"
                 )
 
             } catch (e: HttpException) {
                 e.printStackTrace()
                 Result.Error(
-                    message = e.message()
+                    message ="${e.message.toString()} HttpException"
                 )
 
             }
