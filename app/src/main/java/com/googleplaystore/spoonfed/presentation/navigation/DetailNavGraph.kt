@@ -11,7 +11,7 @@ import com.googleplaystore.spoonfed.presentation.detail_screen.DetailRoute
 
 private const val TAG = "detailNavGraph"
 fun NavController.navigateToDetail(recipeId: Int) {
-    this.navigate("${Screens.DetailScreen.route}?recipeId={$recipeId}")
+    this.navigate("${Screens.DetailScreen.route}?recipeId=$recipeId")
     Log.d(TAG, "navigateToDetail: $recipeId")
 }
 
