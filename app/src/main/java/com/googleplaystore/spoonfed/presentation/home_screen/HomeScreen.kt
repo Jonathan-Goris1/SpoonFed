@@ -15,8 +15,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,14 +38,17 @@ internal fun HomeRoute(
     homeViewModel: HomeScreenViewModel = hiltViewModel()
 ) {
     val homeUiState = homeViewModel.uiState.collectAsState().value
+    val searchQuery = homeViewModel.searchQuery.collectAsState().value
+
     HomeScreen(
         modifier = modifier,
-        foodName = homeViewModel.searchQuery,
-        onFoodNameChange = { homeViewModel.updateSearchQuery(homeViewModel.searchQuery) },
-        getQueryRecipe = { homeViewModel.getQueryRecipe(homeViewModel.searchQuery) },
+        foodName = searchQuery,
+        onFoodNameChange = { input -> homeViewModel.updateSearchQuery(input) },
+        getQueryRecipe = { homeViewModel.getQueryRecipe(searchQuery) },
         homeUiState = homeUiState,
         onRecipeClick = onRecipeClick
     )
+
 
 }
 
@@ -89,21 +93,21 @@ internal fun HomeScreen(
         ) {
 
 
-            SearchBar(
-                modifier = modifier,
-                foodName = foodName,
-                onFoodNameChange = { onFoodNameChange(foodName) },
-                getQueryRecipe = { getQueryRecipe(foodName) },
-                scrollToTop = { coroutineScope.launch { listState.scrollToItem(0) } })
-            
             when (homeUiState) {
                 is HomeUiState.Loading -> {
                     HomeLoadingWheel(modifier = modifier)
                 }
                 is HomeUiState.Error -> {
-                    HomeErrorState(modifier = modifier,errorMessage = homeUiState.message)
+                    HomeErrorState(modifier = modifier, errorMessage = homeUiState.message)
                 }
                 is HomeUiState.Success -> {
+                    SearchBar(
+                        modifier = modifier,
+                        foodName = foodName,
+                        onFoodNameChange = { onFoodNameChange(it) },
+                        getQueryRecipe = { getQueryRecipe(foodName) },
+                        scrollToTop = { coroutineScope.launch { listState.scrollToItem(0) } })
+
                     RecipeItem(
                         modifier = modifier,
                         recipe = homeUiState.recipes,
@@ -137,11 +141,11 @@ fun RecipeItem(
             .fillMaxWidth(),
         state = listState,
         columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(0.dp),
+        contentPadding = PaddingValues(bottom = 80.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
 
-    ) {
+        ) {
 
         items(recipe ?: emptyList()) { recipe ->
             RecipeCard(recipe = recipe) {
@@ -167,18 +171,25 @@ fun SearchBar(
 ) {
     OutlinedTextField(
         value = foodName,
-        onValueChange = onFoodNameChange,
+        onValueChange = { onFoodNameChange(it) },
         maxLines = 1,
         singleLine = true,
-        textStyle = TextStyle(color = Color.White),
+        textStyle = MaterialTheme.typography.bodyMedium,
         placeholder = {
             Text(
                 fontSize = 18.sp,
-                text = stringResource(id = R.string.SearchForRecipesText)
+                text = stringResource(id = R.string.SearchForRecipesText),
+                style = MaterialTheme.typography.displayMedium
             )
         },
 
-        keyboardActions = KeyboardActions { getQueryRecipe(foodName); scrollToTop() },
+        keyboardActions = KeyboardActions {
+            if (foodName.isNotBlank()) {
+                getQueryRecipe(foodName); scrollToTop()
+            } else {
+                TODO("Add SnackBar message here")
+            }
+        },
         leadingIcon = {
             Icon(
                 imageVector = Icons.Filled.Search,
@@ -207,7 +218,17 @@ fun HomeErrorState(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = errorMessage ?: "No Internet")
+
+        Icon(
+            modifier = modifier.size(100.dp),
+            imageVector = ImageVector.vectorResource(R.drawable.baseline_signal_wifi_statusbar_connected_no_internet_4_24),
+            contentDescription = "No Internet",
+
+            )
+        Text(
+            text = errorMessage ?: "No Internet",
+            style = MaterialTheme.typography.titleLarge
+        )
     }
 }
 
@@ -232,7 +253,7 @@ fun HomeLoadingWheel(
 
 @Preview
 @Composable
-fun SearchBarPreview(){
+fun SearchBarPreview() {
     SearchBar(
         modifier = Modifier,
         foodName = "",
@@ -241,6 +262,7 @@ fun SearchBarPreview(){
         scrollToTop = {}
     )
 }
+
 @Preview
 @Composable
 fun ErrorStatePreview() {
