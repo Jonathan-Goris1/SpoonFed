@@ -12,6 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Share
@@ -178,16 +179,22 @@ fun DetailItem(
             state = listState,
             modifier = modifier
                 .padding(paddingValues)
-                .fillMaxSize()
+                .fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 80.dp),
         ) {
-            item { ImageProfile(title = recipe?.title ?: "", image = recipe?.image ?: "", modifier = modifier) }
             item {
-                HeaderRow(
-                    text1 = stringResource(id = R.string.IngredientsHeaderText),
-                    text2 = "${recipe?.servings ?: 0} ${stringResource(id = R.string.ServingsHeaderText)}",
+                ImageProfile(
+                    title = recipe?.title ?: "",
+                    image = recipe?.image ?: "",
+                    modifier = modifier
                 )
             }
-            ingredientContent(ingredientsList = recipe?.extendedIngredients ?: emptyList(), modifier = modifier)
+
+            ingredientContent(
+                ingredientsList = recipe?.extendedIngredients ?: emptyList(),
+                modifier = modifier,
+                recipe = recipe
+            )
 
             item {
                 HeaderRow(
@@ -196,11 +203,17 @@ fun DetailItem(
                     onClick = { expandEvent() })
             }
             if (isExpanded) {
-                nutrientsContent(nutrientList = recipe?.nutrition?.nutrients ?: emptyList(), modifier = modifier)
+                nutrientsContent(
+                    nutrientList = recipe?.nutrition?.nutrients ?: emptyList(),
+                    modifier = modifier
+                )
             }
 
-            item { HeaderRow(text1 = stringResource(id = R.string.PreparationHeaderText)) }
-            preparationContent(instructions = recipe?.analyzedInstructions ?: emptyList(), modifier = modifier)
+
+            preparationContent(
+                instructions = recipe?.analyzedInstructions ?: emptyList(),
+                modifier = modifier
+            )
 
         }
 
@@ -234,8 +247,15 @@ fun ImageProfile(
 @RequiresApi(Build.VERSION_CODES.M)
 fun LazyListScope.ingredientContent(
     modifier: Modifier,
-    ingredientsList: List<ExtendedIngredient>
+    ingredientsList: List<ExtendedIngredient>,
+    recipe: Recipe?
 ) {
+    item {
+        HeaderRow(
+            text1 = stringResource(id = R.string.IngredientsHeaderText),
+            text2 = "${recipe?.servings ?: 0} ${stringResource(id = R.string.ServingsHeaderText)}",
+        )
+    }
     items(ingredientsList) { ingredient ->
         IngredientSection(ingredients = ingredient, modifier = modifier)
     }
@@ -256,7 +276,8 @@ fun IngredientSection(
 
         Text(
             textAlign = TextAlign.Start,
-            text = ingredients.name ?: ""
+            text = ingredients.name ?: "",
+            style = MaterialTheme.typography.labelLarge
         )
         Spacer(modifier.weight(1f))
 
@@ -272,12 +293,14 @@ fun IngredientSection(
                 setTextColor(resources.getColor(R.color.black, resources.newTheme()))
                 textSize = 16f
                 textAlignment = View.TEXT_ALIGNMENT_TEXT_END
+
             }
         })
 
         Text(
             textAlign = TextAlign.Start,
-            text = ingredients.unit ?: ""
+            text = ingredients.unit ?: "",
+            style = MaterialTheme.typography.labelLarge
         )
     }
     Divider(
@@ -290,8 +313,9 @@ fun IngredientSection(
 
 fun LazyListScope.nutrientsContent(
     modifier: Modifier,
-    nutrientList: List<NutrientX>
-) {
+    nutrientList: List<NutrientX>,
+
+    ) {
     items(nutrientList) { nutrient ->
         NutrientsSection(nutrient = nutrient, modifier = modifier)
     }
@@ -311,13 +335,15 @@ fun NutrientsSection(
 
         Text(
             textAlign = TextAlign.Start,
-            text = nutrient.name ?: ""
+            text = nutrient.name ?: "",
+            style = MaterialTheme.typography.labelLarge
         )
         Spacer(modifier.weight(1f))
 
         Text(
             textAlign = TextAlign.End,
-            text = " ${nutrient.amount} ${nutrient.unit}"
+            text = " ${nutrient.amount} ${nutrient.unit}",
+            style = MaterialTheme.typography.labelLarge
         )
     }
     Divider(
@@ -331,6 +357,7 @@ fun LazyListScope.preparationContent(
     modifier: Modifier,
     instructions: List<AnalyzedInstruction>
 ) {
+    item { HeaderRow(text1 = stringResource(id = R.string.PreparationHeaderText)) }
     items(instructions) { instruction ->
         for (element in instruction.steps!!) {
             PreparationSection(step = element, modifier = modifier)
@@ -346,29 +373,30 @@ fun PreparationSection(
     modifier: Modifier,
     step: Step
 ) {
-    Box(
+
+    Row(
         modifier = modifier
+            .padding(8.dp)
             .fillMaxWidth()
-            .padding(4.dp)
-
+            .background(
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                shape = RoundedCornerShape(4.dp)
+            ),
     ) {
-        Row(
-            modifier = modifier
-                .padding(8.dp),
-        ) {
-            Text(
-                modifier = modifier.padding(start = 8.dp),
-                text = "${step.number}"
-            )
-            Spacer(modifier = modifier.padding(horizontal = 8.dp))
+        Text(
+            modifier = modifier.padding(start = 8.dp),
+            text = "${step.number}",
+            style = MaterialTheme.typography.titleMedium
+        )
+        Spacer(modifier = modifier.padding(horizontal = 8.dp))
 
-            Text(
-                text = step.step ?: "",
+        Text(
+            text = step.step ?: "N/A",
+            style = MaterialTheme.typography.bodyLarge
 
-                )
-        }
-
+        )
     }
+
 }
 
 @Composable
