@@ -290,7 +290,7 @@ fun IngredientSection(
                         HtmlCompat.FROM_HTML_MODE_LEGACY
                     )
                 }"
-                setTextColor(resources.getColor(R.color.black, resources.newTheme()))
+                setTextColor(resources.getColor(R.color.white, resources.newTheme()))
                 textSize = 16f
                 textAlignment = View.TEXT_ALIGNMENT_TEXT_END
 
@@ -316,7 +316,9 @@ fun LazyListScope.nutrientsContent(
     nutrientList: List<NutrientX>,
 
     ) {
-    items(nutrientList) { nutrient ->
+    val limitedNutrientsList = nutrientList.take(9)
+
+    items(limitedNutrientsList) { nutrient ->
         NutrientsSection(nutrient = nutrient, modifier = modifier)
     }
 }
@@ -379,7 +381,7 @@ fun PreparationSection(
             .padding(8.dp)
             .fillMaxWidth()
             .background(
-                color = MaterialTheme.colorScheme.secondaryContainer,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 shape = RoundedCornerShape(4.dp)
             ),
     ) {
