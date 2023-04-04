@@ -179,7 +179,8 @@ fun SearchBar(
             Text(
                 fontSize = 18.sp,
                 text = stringResource(id = R.string.SearchForRecipesText),
-                style = MaterialTheme.typography.displayMedium
+                style = MaterialTheme.typography.displayMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
         },
 
@@ -193,7 +194,8 @@ fun SearchBar(
         leadingIcon = {
             Icon(
                 imageVector = Icons.Filled.Search,
-                contentDescription = stringResource(id = R.string.searchDescription)
+                contentDescription = stringResource(id = R.string.searchDescription),
+                tint = Color.White
             )
         },
         colors = TextFieldDefaults.outlinedTextFieldColors(
