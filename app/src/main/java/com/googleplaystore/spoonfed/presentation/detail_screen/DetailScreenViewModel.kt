@@ -1,5 +1,6 @@
 package com.googleplaystore.spoonfed.presentation.detail_screen
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -34,6 +35,8 @@ class DetailScreenViewModel @Inject constructor(
      val recipeID: Int = checkNotNull(savedStateHandle["recipeId"])
 
     init {
+        Log.d("DetailScreenViewModel", "DetailScreenViewModel: Initialized")
+
         getRecipeByID()
     }
     fun isExpandedView(notExpanded: Boolean){
@@ -47,6 +50,8 @@ class DetailScreenViewModel @Inject constructor(
 
     private fun getRecipeByID() {
         viewModelScope.launch {
+            Log.d("DetailScreenViewModel", "getRecipeByID: started")
+
             when (
                 val result = repository.getRecipeWithID(recipeID = recipeID)
             ) {

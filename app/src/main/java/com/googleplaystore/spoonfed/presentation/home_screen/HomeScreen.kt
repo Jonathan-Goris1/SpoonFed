@@ -37,15 +37,17 @@ internal fun HomeRoute(
     modifier: Modifier,
     homeViewModel: HomeScreenViewModel = hiltViewModel()
 ) {
-    val homeUiState = homeViewModel.uiState.collectAsState().value
-    val searchQuery = homeViewModel.searchQuery.collectAsState().value
+    val homeUiState = homeViewModel.uiState.collectAsState()
+    val searchQuery = homeViewModel.searchQuery.collectAsState()
+    Log.d("HomeRoute", "HomeRoute: Screen Created")
+
 
     HomeScreen(
         modifier = modifier,
-        foodName = searchQuery,
+        foodName = searchQuery.value,
         onFoodNameChange = { input -> homeViewModel.updateSearchQuery(input) },
-        getQueryRecipe = { homeViewModel.getQueryRecipe(searchQuery) },
-        homeUiState = homeUiState,
+        getQueryRecipe = { homeViewModel.getQueryRecipe(searchQuery.value) },
+        homeUiState = homeUiState.value,
         onRecipeClick = onRecipeClick
     )
 
@@ -95,12 +97,18 @@ internal fun HomeScreen(
 
             when (homeUiState) {
                 is HomeUiState.Loading -> {
+                    Log.d("HomeScreen", "HomeScreen: Loading")
+
                     HomeLoadingWheel(modifier = modifier)
                 }
                 is HomeUiState.Error -> {
+                    Log.d("HomeScreen", "HomeScreen: Error")
+
                     HomeErrorState(modifier = modifier, errorMessage = homeUiState.message)
                 }
                 is HomeUiState.Success -> {
+                    Log.d("HomeScreen", "HomeScreen: Success")
+
                     SearchBar(
                         modifier = modifier,
                         foodName = foodName,

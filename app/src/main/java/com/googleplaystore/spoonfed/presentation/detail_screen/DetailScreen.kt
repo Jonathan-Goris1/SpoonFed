@@ -56,7 +56,7 @@ internal fun DetailRoute(
             listState.firstVisibleItemIndex > 0
         }
     }
-    Log.d(TAG, "DetailRoute: ${detailViewModel.recipeID}")
+    Log.d(TAG, "DetailRoute: Screen created")
     DetailScreen(
         modifier = modifier,
         onBackClick = onBackClick,
@@ -87,12 +87,18 @@ internal fun DetailScreen(
 ) {
     when (detailUIState) {
         is DetailUiState.Loading -> {
+            Log.d(TAG, "DetailScreen: Loading")
+
             DetailLoadingWheel(modifier = modifier)
         }
         is DetailUiState.Error -> {
+            Log.d(TAG, "DetailScreen: Error")
+
             DetailErrorState(errorMessage = detailUIState.message, modifier = modifier)
         }
         is DetailUiState.Success -> {
+            Log.d(TAG, "DetailScreen: Success")
+
             DetailItem(
                 modifier = modifier,
                 onBackClick = onBackClick,

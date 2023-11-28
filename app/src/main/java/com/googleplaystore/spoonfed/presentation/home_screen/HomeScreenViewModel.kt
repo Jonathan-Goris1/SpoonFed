@@ -1,12 +1,14 @@
 package com.googleplaystore.spoonfed.presentation.home_screen
 
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.googleplaystore.spoonfed.domain.models.Recipe
 import com.googleplaystore.spoonfed.domain.repository.RecipeRepository
 import com.googleplaystore.spoonfed.util.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,6 +31,8 @@ class HomeScreenViewModel @Inject constructor(
 
 
     init {
+        Log.d("HomeScreenViewModel", "HomeScreenViewModel: Initialized")
+
         getRandomRecipe()
     }
 
@@ -38,7 +42,9 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     private fun getRandomRecipe() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
+            Log.d("HomeScreenViewModel", "getRandomRecipe: Started")
+
             when (
                 val result = repository.getRandomRecipes()
             ) {
